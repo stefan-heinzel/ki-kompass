@@ -1,0 +1,12 @@
+# Private Kursunterlagen und Wissensbasis
+_privat/
+
+# Schlüssel und lokale Einstellungen
+.env
+.env.*
+*.key
+.claude/settings.local.json
+
+# System und Abhängigkeiten
+.DS_Store
+node_modules/
