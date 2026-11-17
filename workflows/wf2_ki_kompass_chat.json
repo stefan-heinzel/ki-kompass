@@ -1,0 +1,142 @@
+{
+  "name": "WF2 · KI-Kompass Chat",
+  "nodes": [
+    {
+      "id": "c1",
+      "name": "Frage empfangen",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [0, 0],
+      "parameters": {
+        "public": false,
+        "initialMessages": "Hallo! Ich beantworte Ihre Fragen zum KI-Konzept unserer Schule – mit Quellenangabe.",
+        "options": {}
+      }
+    },
+    {
+      "id": "c2",
+      "name": "KI-Kompass",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [400, 0],
+      "parameters": {
+        "promptType": "auto",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Rolle & Zweck\nDu bist der „KI-Kompass“, der KI-Strategieberater für die Lehrkräfte einer Gesamtschule in NRW. Du berätst präzise, praxistauglich und rechtssicher zu allen Fragen rund um das schulische KI-Konzept: Unterrichtsalltag, Leistungsbewertung, Datenschutz sowie Kommunikation mit Eltern und Schüler:innen.\n\nWissensbasis\n- Nutze für JEDE inhaltliche Antwort zuerst das Werkzeug „Konzept-Suche“. Antworte nur auf Basis der gefundenen Abschnitte des KI-Konzepts (Entwurf v3.0). Erfinde nichts.\n- Steht etwas nicht im Konzept, sage das freundlich und verweise an die AG KI der Schule.\n- Quellenangabe: Belege jede Regelung mit „(KI-Konzept v3.0, S. X)“ – Seite aus metadata.loc.pageNumber, Version aus metadata.version. Nenne zusätzlich den Abschnitt oder Anhang, wenn er im gefundenen Text erkennbar ist (z. B. „Säule 2: Prüfen & Bewerten“, „Anhang 1: Richtlinie für Lehrkräfte“).\n\nKernprinzipien & Tonalität\n- Professionell, kollegial, pragmatisch und ermutigend – Unterstützung statt Bürokratie. Sprich die Lehrkräfte mit „Sie“ an.\n- Leitgrundsatz „Human-in-the-Loop“: Der Mensch behält das letzte Wort, KI bewertet nicht automatisch.\n- Datenschutz: Keine personenbezogenen Daten von Schüler:innen oder Eltern. Dienstliche Standard-Tools laut Konzept sind AIS.chat (NRW-Landesplattform) und fobizz.\n\nGrenzen\n- Du erklärst die Bewertungsregeln des Konzepts, aber du bewertest oder benotest keine konkreten Schülerarbeiten und schlägst keine Noten für einzelne Schüler:innen vor. Lehne das freundlich ab und verweise auf die Regeln des Konzepts.\n- Enthält eine Frage Namen oder andere personenbezogene Daten von Schüler:innen oder Eltern, verarbeite sie nicht, sondern bitte um eine anonymisierte Formulierung.\n\nAntwort-Logik für häufige Anwendungsfälle (Inhalte immer per Konzept-Suche bestätigen und belegen)\n- Unterrichtseinsatz & Ampelsystem: Beziehe dich auf die drei Stufen GRÜN (frei/erlaubt), GELB (mit Erlaubnis/Kennzeichnung), ROT (verboten). Betone die klare Ansage der Lehrkraft vorab und was laut Konzept gilt, wenn eine Ansage fehlt.\n- Leistungsbewertung & Prüfungen (Säule 2): Goldene Regel – bewertet wird die Eigenleistung, nicht die Leistung der KI. Shift „Vom Produkt zum Prozess“: höhere Gewichtung von Fachgespräch, Dokumentation und Reflexion. Erkläre die Veto-Regel im Fachgespräch so, wie das Konzept sie beschreibt. Verweise bei Rastern auf das Basisraster (Anhang 6) bzw. den 11-Raster-Pool von Joscha Falck.\n- Eltern- und Schülerkommunikation: Gib konkrete, leicht verständliche Formulierungshilfen. Betone Transparenz, Chancengerechtigkeit (schulische Tools sichern gleichen Zugang) und Schutz vor Missbrauch (Deepfakes, Persönlichkeitsrechte).\n- Unterrichtsplanung & Operatoren: Empfiehl „Provokation durch Design“ (Aufgaben so bauen, dass bloßes Generieren nicht reicht) und die Meta-KI-Operatoren aus Anhang 5 (z. B. Dokumentieren, Begründen, Analysieren, Reflektieren, Optimieren).\n\nFormatierung\nAntworte in höchstens ca. 150 Wörtern: zuerst die direkte Antwort in 1–2 Sätzen, dann die wichtigsten Punkte mit Quelle. Biete Details nur auf Nachfrage an. Strukturiert und auf den Punkt: kurze Absätze, Bullet Points, Fettdruck für wichtige Begriffe. Quellenangaben am Ende der jeweiligen Aussage."
+        }
+      }
+    },
+    {
+      "id": "c3",
+      "name": "Sprachmodell Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [272, 320],
+      "parameters": {
+        "model": "anthropic/claude-sonnet-5.5",
+        "options": { "temperature": 0.2 }
+      },
+      "credentials": {
+        "openRouterApi": { "id": "B8KK5T8eVmmfnj7s", "name": "OpenRouter - n8n" }
+      }
+    },
+    {
+      "id": "c4",
+      "name": "Gedächtnis",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [432, 320],
+      "parameters": { "sessionIdType": "fromInput", "contextWindowLength": 6 }
+    },
+    {
+      "id": "c5",
+      "name": "Konzept-Suche",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.4,
+      "position": [592, 320],
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Durchsucht das KI-Konzept der Schule (Entwurf v3.0). Liefert passende Abschnitte mit Seitenzahl (metadata.loc.pageNumber) und Version. Für jede inhaltliche Frage verwenden.",
+        "qdrantCollection": { "__rl": true, "mode": "id", "value": "ki_konzept" },
+        "topK": 5,
+        "includeDocumentMetadata": true,
+        "options": {}
+      },
+      "credentials": {
+        "qdrantApi": { "id": "YrWIoyddTi8lENqW", "name": "Qdrant KI-Kompass" }
+      }
+    },
+    {
+      "id": "c6",
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [592, 544],
+      "parameters": { "modelName": "models/gemini-embedding-001" },
+      "credentials": {
+        "googlePalmApi": { "id": "sX7e2VJ6GUWIk4YX", "name": "Gemini - Embeddings" }
+      }
+    },
+    {
+      "id": "s1",
+      "name": "Notiz ①",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-80, -120],
+      "parameters": {
+        "content": "## ① Frage empfangen\nLehrkräfte stellen ihre Frage im Chat. Begrüßung und Chat-Fenster kommen vom Chat Trigger (noch nicht öffentlich).",
+        "width": 260,
+        "height": 300,
+        "color": 4
+      }
+    },
+    {
+      "id": "s2",
+      "name": "Notiz ②",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, -120],
+      "parameters": {
+        "content": "## ② KI-Kompass beantwortet (Konzept-Suche + Sprachmodell)\nDer Agent durchsucht per Konzept-Suche (Qdrant, Gemini-Embeddings) das KI-Konzept und antwortet mit Quellenangabe (Seite, Version). Gedächtnis: letzte 6 Nachrichten.",
+        "width": 560,
+        "height": 820,
+        "color": 5
+      }
+    },
+    {
+      "id": "s3",
+      "name": "Notiz ③",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-80, 240],
+      "parameters": {
+        "content": "## ③ Sicherheitsprüfung (Stufe 2)\nPlatzhalter: Guardrails vor dem Agenten.",
+        "width": 260,
+        "height": 200,
+        "color": 3
+      }
+    },
+    {
+      "id": "s4",
+      "name": "Notiz ④",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [800, -120],
+      "parameters": {
+        "content": "## ④ Anonymes Protokoll (Stufe 4)\nPlatzhalter: anonymes Logging in die Data Table für das Dashboard.",
+        "width": 260,
+        "height": 300,
+        "color": 6
+      }
+    }
+  ],
+  "connections": {
+    "Frage empfangen": { "main": [[{ "node": "KI-Kompass", "type": "main", "index": 0 }]] },
+    "Sprachmodell Sonnet": { "ai_languageModel": [[{ "node": "KI-Kompass", "type": "ai_languageModel", "index": 0 }]] },
+    "Gedächtnis": { "ai_memory": [[{ "node": "KI-Kompass", "type": "ai_memory", "index": 0 }]] },
+    "Konzept-Suche": { "ai_tool": [[{ "node": "KI-Kompass", "type": "ai_tool", "index": 0 }]] },
+    "Embeddings Google Gemini": { "ai_embedding": [[{ "node": "Konzept-Suche", "type": "ai_embedding", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
