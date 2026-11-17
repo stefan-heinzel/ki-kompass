@@ -1,0 +1,247 @@
+{
+  "name": "WF1 · Wissensbasis Ingest",
+  "nodes": [
+    {
+      "id": "n1",
+      "name": "Konzept hochladen",
+      "webhookId": "ki-konzept-upload",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [0, 0],
+      "parameters": {
+        "authentication": "basicAuth",
+        "formTitle": "KI-Konzept hochladen",
+        "formDescription": "PDF des schulischen KI-Konzepts hochladen. Die bisherige Wissensbasis wird dabei vollständig ersetzt.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Datei",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "version",
+              "placeholder": "v3.0",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": { "path": "ki-konzept-upload" }
+      },
+      "credentials": {
+        "httpBasicAuth": { "id": "KZwwJnWIBDLtnP1V", "name": "Upload - Admin" }
+      }
+    },
+    {
+      "id": "n2",
+      "name": "In Qdrant speichern",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.4,
+      "position": [640, 0],
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": { "__rl": true, "mode": "id", "value": "ki_konzept" },
+        "options": {}
+      },
+      "credentials": {
+        "qdrantApi": { "id": "YrWIoyddTi8lENqW", "name": "Qdrant KI-Kompass" }
+      }
+    },
+    {
+      "id": "n3",
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [208, 240],
+      "parameters": {},
+      "credentials": {
+        "googlePalmApi": { "id": "sX7e2VJ6GUWIk4YX", "name": "Gemini - Embeddings" }
+      }
+    },
+    {
+      "id": "n4",
+      "name": "Dokument laden",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [448, 240],
+      "parameters": {
+        "dataType": "binary",
+        "binaryMode": "specificField",
+        "loader": "pdfLoader",
+        "binaryDataKey": "Datei",
+        "textSplittingMode": "custom",
+        "options": {
+          "splitPages": true,
+          "metadata": {
+            "metadataValues": [
+              { "name": "quelle", "value": "KI-Konzept" },
+              { "name": "version", "value": "={{ $('Konzept hochladen').item.json.version }}" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "n5",
+      "name": "Text-Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [448, 448],
+      "parameters": { "chunkOverlap": 150, "options": {} }
+    },
+    {
+      "id": "n6",
+      "name": "Alte Version löschen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "onError": "stopWorkflow",
+      "position": [208, -112],
+      "parameters": {
+        "method": "POST",
+        "url": "https://da64c8d4-a014-4bf9-83e4-8f5faabb456e.eu-central-1-0.aws.cloud.qdrant.io:6333/collections/ki_konzept/points/delete?wait=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"filter\":{\"must\":[{\"key\":\"metadata.quelle\",\"match\":{\"value\":\"KI-Konzept\"}}]}}",
+        "options": { "response": { "response": { "fullResponse": true, "neverError": true } } }
+      },
+      "credentials": {
+        "qdrantApi": { "id": "YrWIoyddTi8lENqW", "name": "Qdrant KI-Kompass" }
+      }
+    },
+    {
+      "id": "n7",
+      "name": "Warten auf Löschen",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [400, 0],
+      "parameters": { "mode": "chooseBranch", "useDataOfInput": "2" }
+    },
+    {
+      "id": "n8",
+      "name": "Index sicherstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [100, -300],
+      "parameters": {
+        "method": "PUT",
+        "url": "https://da64c8d4-a014-4bf9-83e4-8f5faabb456e.eu-central-1-0.aws.cloud.qdrant.io:6333/collections/ki_konzept/index?wait=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"field_name\":\"metadata.quelle\",\"field_schema\":\"keyword\"}",
+        "options": { "response": { "response": { "fullResponse": true, "neverError": true } } }
+      },
+      "credentials": {
+        "qdrantApi": { "id": "YrWIoyddTi8lENqW", "name": "Qdrant KI-Kompass" }
+      }
+    },
+    {
+      "id": "n9",
+      "name": "Index OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [300, -300],
+      "parameters": {
+        "conditions": {
+          "options": { "version": 2, "leftValue": "", "caseSensitive": true, "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ ($json.statusCode >= 200 && $json.statusCode < 300) || ($json.statusCode === 404 && JSON.stringify($json.body).includes(\"doesn't exist\")) }}",
+              "rightValue": "",
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "n10",
+      "name": "Abbruch: Index fehlgeschlagen",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [500, -420],
+      "parameters": {
+        "errorMessage": "={{ 'Index fehlgeschlagen. Status ' + $json.statusCode + ': ' + JSON.stringify($json.body) }}"
+      }
+    },
+    {
+      "id": "n11",
+      "name": "Löschen OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [500, -112],
+      "parameters": {
+        "conditions": {
+          "options": { "version": 2, "leftValue": "", "caseSensitive": true, "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ ($json.statusCode >= 200 && $json.statusCode < 300) || ($json.statusCode === 404 && JSON.stringify($json.body).includes(\"doesn't exist\")) }}",
+              "rightValue": "",
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "n12",
+      "name": "Abbruch: Löschen fehlgeschlagen",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [700, -230],
+      "parameters": {
+        "errorMessage": "={{ 'Löschen fehlgeschlagen. Status ' + $json.statusCode + ': ' + JSON.stringify($json.body) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Embeddings Google Gemini": {
+      "ai_embedding": [[{ "node": "In Qdrant speichern", "type": "ai_embedding", "index": 0 }]]
+    },
+    "Dokument laden": {
+      "ai_document": [[{ "node": "In Qdrant speichern", "type": "ai_document", "index": 0 }]]
+    },
+    "Text-Splitter": {
+      "ai_textSplitter": [[{ "node": "Dokument laden", "type": "ai_textSplitter", "index": 0 }]]
+    },
+    "Konzept hochladen": {
+      "main": [[
+        { "node": "Warten auf Löschen", "type": "main", "index": 1 },
+        { "node": "Index sicherstellen", "type": "main", "index": 0 }
+      ]]
+    },
+    "Warten auf Löschen": {
+      "main": [[{ "node": "In Qdrant speichern", "type": "main", "index": 0 }]]
+    },
+    "Index sicherstellen": {
+      "main": [[{ "node": "Index OK?", "type": "main", "index": 0 }]]
+    },
+    "Index OK?": {
+      "main": [
+        [{ "node": "Alte Version löschen", "type": "main", "index": 0 }],
+        [{ "node": "Abbruch: Index fehlgeschlagen", "type": "main", "index": 0 }]
+      ]
+    },
+    "Alte Version löschen": {
+      "main": [[{ "node": "Löschen OK?", "type": "main", "index": 0 }]]
+    },
+    "Löschen OK?": {
+      "main": [
+        [{ "node": "Warten auf Löschen", "type": "main", "index": 0 }],
+        [{ "node": "Abbruch: Löschen fehlgeschlagen", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1", "binaryMode": "separate" }
+}
