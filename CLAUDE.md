@@ -11,6 +11,8 @@ Capstone-Projekt AI Automations & Agents (MSIT München) und IHK-Prüfung „KI-
 - Workflows nach jeder fertigen Änderung mit den n8n-MCP-Tools validieren und als JSON nach `workflows/` exportieren (Dateiname siehe unten).
 - **Live-Stand zuerst:** Stefan und Julian ändern Workflows auch direkt im n8n-Editor. Vor jeder Änderung den aktuellen Stand aus n8n lesen und mit dem Export in `workflows/` vergleichen. Abweichungen (fehlende oder geänderte Parameter, verschobene Verbindungen) zuerst melden und nicht stillschweigend überschreiben.
 - **Editor-feste Parameter:** Beim Speichern im Editor entfernt n8n Parameter, die im aktuellen Node-Schema nicht angezeigt werden (Beispiel 18.11.: `initialMessages` bei nicht-öffentlichem Chat Trigger, `topK` der Konzept-Suche). Parameter daher nur mit den Namen und Bedingungen des aktuellen Node-Schemas setzen und nach dem Speichern erneut auslesen.
+- **Werkzeugnamen:** Nodes, die einem Agenten als Tool dienen, ohne Bindestrich benennen (z. B. `Konzept_Suche`, `Erlass_Suche`) – n8n nutzt den Node-Namen als Tool-Namen. Nur aktuelle Node-Typen verwenden; nach jedem Bauschritt einen echten Testlauf einplanen, da die Validierung Laufzeitfehler nicht erkennt.
+- Julian arbeitet mit Codex; dessen Regeln stehen in `AGENTS.md` und müssen inhaltlich mit dieser Datei übereinstimmen. Regeländerungen in beiden Dateien nachziehen.
 - Systemprompts liegen versioniert in `prompts/`. Bei Prompt-Änderungen Workflow und Datei gemeinsam aktualisieren.
 - Niemals Schlüssel, Tokens oder Passwörter in Dateien, Commits oder Ausgaben schreiben. Zugangsdaten liegen ausschließlich als Credentials in n8n.
 - `_privat/` wird nie committet (steht in `.gitignore`). Daraus nur lesen, nichts kopieren nach `docs/` oder `workflows/`.
