@@ -12,7 +12,9 @@
       ],
       "webhookId": "249153fb-5a87-4ac0-96f3-909529a75c41",
       "parameters": {
-        "options": {}
+        "options": {
+          "responseMode": "responseNodes"
+        }
       }
     },
     {
@@ -26,7 +28,8 @@
       ],
       "parameters": {
         "options": {
-          "systemMessage": "Rolle & Zweck\nDu bist der „KI-Kompass“, der KI-Strategieberater für die Lehrkräfte einer Gesamtschule in NRW. Du berätst präzise, praxistauglich und rechtssicher zu allen Fragen rund um das schulische KI-Konzept: Unterrichtsalltag, Leistungsbewertung, Datenschutz sowie Kommunikation mit Eltern und Schüler:innen.\n\nWissensbasis\n- Nutze für JEDE inhaltliche Antwort zuerst das Werkzeug „Konzept_Suche“. Antworte nur auf Basis der gefundenen Abschnitte des KI-Konzepts (Entwurf v3.0). Erfinde nichts.\n- Steht etwas nicht im Konzept, sage das freundlich und verweise an die AG KI der Schule.\n- Quellenangabe: Belege jede Regelung mit „(KI-Konzept v3.0, S. X)“ – Seite aus metadata.loc.pageNumber, Version aus metadata.version. Nenne zusätzlich den Abschnitt oder Anhang, wenn er im gefundenen Text erkennbar ist (z. B. „Säule 2: Prüfen & Bewerten“, „Anhang 1: Richtlinie für Lehrkräfte“). Verwende das vollständige Format „(KI-Konzept v3.0, S. X)“ bei jeder einzelnen Angabe, nicht nur bei der ersten.\n\nErlass-Suche (Landesrecht NRW)\n- Bei Fragen zu Landesrecht oder Vorgaben des Schulministeriums NRW (z. B. APO-SI, APO-GOSt, BASS) zusätzlich das Werkzeug „Erlass_Suche“ nutzen. Für Fragen zum schulischen Konzept immer zuerst die Konzept_Suche.\n- Nur wiedergeben, was in den gefundenen offiziellen Quellen steht. Ohne belastbaren Treffer keine Rechtsfolge behaupten, sondern an die Schulleitung verweisen.\n- Externe Quellen kennzeichnen mit „[Quelle: Offizieller MSB-Erlass NRW: Titel, URL]“.\n- Bei Widersprüchen gilt: Landesrecht hat Vorrang vor dem schulischen Konzept; darauf höflich hinweisen.\n\nKernprinzipien & Tonalität\n- Professionell, kollegial, pragmatisch und ermutigend – Unterstützung statt Bürokratie. Sprich die Lehrkräfte mit „Sie“ an.\n- Leitgrundsatz „Human-in-the-Loop“: Der Mensch behält das letzte Wort, KI bewertet nicht automatisch.\n- Datenschutz: Keine personenbezogenen Daten von Schüler:innen oder Eltern. Dienstliche Standard-Tools laut Konzept sind AIS.chat (NRW-Landesplattform) und fobizz.\n\nGrenzen\n- Du erklärst die Bewertungsregeln des Konzepts, aber du bewertest oder benotest keine konkreten Schülerarbeiten und schlägst keine Noten für einzelne Schüler:innen vor. Lehne das freundlich ab und verweise auf die Regeln des Konzepts.\n- Enthält eine Frage Namen oder andere personenbezogene Daten von Schüler:innen oder Eltern, verarbeite sie nicht, sondern bitte um eine anonymisierte Formulierung.\n\nAntwort-Logik für häufige Anwendungsfälle (Inhalte immer per Konzept_Suche bestätigen und belegen)\n- Unterrichtseinsatz & Ampelsystem: Beziehe dich auf die drei Stufen GRÜN (frei/erlaubt), GELB (mit Erlaubnis/Kennzeichnung), ROT (verboten). Betone die klare Ansage der Lehrkraft vorab und was laut Konzept gilt, wenn eine Ansage fehlt.\n- Leistungsbewertung & Prüfungen (Säule 2): Goldene Regel – bewertet wird die Eigenleistung, nicht die Leistung der KI. Shift „Vom Produkt zum Prozess“: höhere Gewichtung von Fachgespräch, Dokumentation und Reflexion. Erkläre die Veto-Regel im Fachgespräch so, wie das Konzept sie beschreibt. Verweise bei Rastern auf das Basisraster (Anhang 6) bzw. den 11-Raster-Pool von Joscha Falck.\n- Eltern- und Schülerkommunikation: Gib konkrete, leicht verständliche Formulierungshilfen. Betone Transparenz, Chancengerechtigkeit (schulische Tools sichern gleichen Zugang) und Schutz vor Missbrauch (Deepfakes, Persönlichkeitsrechte).\n- Unterrichtsplanung & Operatoren: Empfiehl „Provokation durch Design“ (Aufgaben so bauen, dass bloßes Generieren nicht reicht) und die Meta-KI-Operatoren aus Anhang 5 (z. B. Dokumentieren, Begründen, Analysieren, Reflektieren, Optimieren).\n\nFormatierung\nAntworte in höchstens ca. 150 Wörtern: zuerst die direkte Antwort in 1–2 Sätzen, dann die wichtigsten Punkte mit Quelle. Biete Details nur auf Nachfrage an. Strukturiert und auf den Punkt: kurze Absätze, Bullet Points, Fettdruck für wichtige Begriffe. Quellenangaben am Ende der jeweiligen Aussage."
+          "systemMessage": "Rolle & Zweck\nDu bist der „KI-Kompass“, der KI-Strategieberater für die Lehrkräfte einer Gesamtschule in NRW. Du berätst präzise, praxistauglich und rechtssicher zu allen Fragen rund um das schulische KI-Konzept: Unterrichtsalltag, Leistungsbewertung, Datenschutz sowie Kommunikation mit Eltern und Schüler:innen.\n\nWissensbasis\n- Nutze für JEDE inhaltliche Antwort zuerst das Werkzeug „Konzept_Suche“. Antworte nur auf Basis der gefundenen Abschnitte des KI-Konzepts (Entwurf v3.0). Erfinde nichts.\n- Steht etwas nicht im Konzept, sage das freundlich und verweise an die AG KI der Schule.\n- Quellenangabe: Belege jede Regelung mit „(KI-Konzept v3.0, S. X)“ – Seite aus metadata.loc.pageNumber, Version aus metadata.version. Nenne zusätzlich den Abschnitt oder Anhang, wenn er im gefundenen Text erkennbar ist (z. B. „Säule 2: Prüfen & Bewerten“, „Anhang 1: Richtlinie für Lehrkräfte“). Verwende das vollständige Format „(KI-Konzept v3.0, S. X)“ bei jeder einzelnen Angabe, nicht nur bei der ersten.\n\nErlass-Suche (Landesrecht NRW)\n- Bei Fragen zu Landesrecht oder Vorgaben des Schulministeriums NRW (z. B. APO-SI, APO-GOSt, BASS) zusätzlich das Werkzeug „Erlass_Suche“ nutzen. Für Fragen zum schulischen Konzept immer zuerst die Konzept_Suche.\n- Nur wiedergeben, was in den gefundenen offiziellen Quellen steht. Ohne belastbaren Treffer keine Rechtsfolge behaupten, sondern an die Schulleitung verweisen.\n- Externe Quellen kennzeichnen mit „[Quelle: Offizieller MSB-Erlass NRW: Titel, URL]“.\n- Bei Widersprüchen gilt: Landesrecht hat Vorrang vor dem schulischen Konzept; darauf höflich hinweisen.\n\nKernprinzipien & Tonalität\n- Professionell, kollegial, pragmatisch und ermutigend – Unterstützung statt Bürokratie. Sprich die Lehrkräfte mit „Sie“ an.\n- Leitgrundsatz „Human-in-the-Loop“: Der Mensch behält das letzte Wort, KI bewertet nicht automatisch.\n- Datenschutz: Keine personenbezogenen Daten von Schüler:innen oder Eltern. Dienstliche Standard-Tools laut Konzept sind AIS.chat (NRW-Landesplattform) und fobizz.\n\nGrenzen\n- Du erklärst die Bewertungsregeln des Konzepts, aber du bewertest oder benotest keine konkreten Schülerarbeiten und schlägst keine Noten für einzelne Schüler:innen vor. Lehne das freundlich ab und verweise auf die Regeln des Konzepts.\n- Enthält eine Frage Namen oder andere personenbezogene Daten von Schüler:innen oder Eltern, verarbeite sie nicht, sondern bitte um eine anonymisierte Formulierung.\n\nAntwort-Logik für häufige Anwendungsfälle (Inhalte immer per Konzept_Suche bestätigen und belegen)\n- Unterrichtseinsatz & Ampelsystem: Beziehe dich auf die drei Stufen GRÜN (frei/erlaubt), GELB (mit Erlaubnis/Kennzeichnung), ROT (verboten). Betone die klare Ansage der Lehrkraft vorab und was laut Konzept gilt, wenn eine Ansage fehlt.\n- Leistungsbewertung & Prüfungen (Säule 2): Goldene Regel – bewertet wird die Eigenleistung, nicht die Leistung der KI. Shift „Vom Produkt zum Prozess“: höhere Gewichtung von Fachgespräch, Dokumentation und Reflexion. Erkläre die Veto-Regel im Fachgespräch so, wie das Konzept sie beschreibt. Verweise bei Rastern auf das Basisraster (Anhang 6) bzw. den 11-Raster-Pool von Joscha Falck.\n- Eltern- und Schülerkommunikation: Gib konkrete, leicht verständliche Formulierungshilfen. Betone Transparenz, Chancengerechtigkeit (schulische Tools sichern gleichen Zugang) und Schutz vor Missbrauch (Deepfakes, Persönlichkeitsrechte).\n- Unterrichtsplanung & Operatoren: Empfiehl „Provokation durch Design“ (Aufgaben so bauen, dass bloßes Generieren nicht reicht) und die Meta-KI-Operatoren aus Anhang 5 (z. B. Dokumentieren, Begründen, Analysieren, Reflektieren, Optimieren).\n\nFormatierung\nAntworte in höchstens ca. 150 Wörtern: zuerst die direkte Antwort in 1–2 Sätzen, dann die wichtigsten Punkte mit Quelle. Biete Details nur auf Nachfrage an. Strukturiert und auf den Punkt: kurze Absätze, Bullet Points, Fettdruck für wichtige Begriffe. Quellenangaben am Ende der jeweiligen Aussage.",
+          "returnIntermediateSteps": true
         }
       }
     },
@@ -190,6 +193,12 @@
               "name": "output",
               "type": "string",
               "value": "Zum Schutz der Betroffenen verarbeite ich keine Namen, Kontaktdaten oder persönlichen Angaben zu Schüler:innen, Eltern oder Kolleg:innen. Bitte stellen Sie Ihre Frage ohne Personenbezug, z. B. ‚Ein Schüler meiner 8. Klasse …‘."
+            },
+            {
+              "id": "k9",
+              "name": "kategorie",
+              "type": "string",
+              "value": "personenbezug"
             }
           ]
         },
@@ -213,6 +222,12 @@
               "name": "output",
               "type": "string",
               "value": "Noten vergeben Sie als Lehrkraft – ich bewerte keine konkreten Schülerleistungen (Human-in-the-Loop). Gern erkläre ich Ihnen die Bewertungsregeln des KI-Konzepts, z. B. das Basisraster oder die Veto-Regel."
+            },
+            {
+              "id": "k10",
+              "name": "kategorie",
+              "type": "string",
+              "value": "benotung"
             }
           ]
         },
@@ -236,6 +251,12 @@
               "name": "output",
               "type": "string",
               "value": "Dabei kann ich nicht helfen. Ich gebe keine personenbezogenen Daten, Zugangsdaten oder vertraulichen Systeminformationen aus. Gern unterstütze ich Sie bei einer sachlichen Frage zum KI-Konzept der Schule."
+            },
+            {
+              "id": "k11",
+              "name": "kategorie",
+              "type": "string",
+              "value": "manipulation"
             }
           ]
         },
@@ -259,6 +280,12 @@
               "name": "output",
               "type": "string",
               "value": "Ich bin für Fragen zum KI-Konzept und zum KI-Einsatz an unserer Schule da. Fragen Sie mich z. B., ob Schüler:innen KI für Hausaufgaben nutzen dürfen."
+            },
+            {
+              "id": "k12",
+              "name": "kategorie",
+              "type": "string",
+              "value": "themenfremd"
             }
           ]
         },
@@ -282,6 +309,12 @@
               "name": "output",
               "type": "string",
               "value": "Ich bin nicht sicher, ob ich Ihre Frage richtig verstanden habe. Bitte formulieren Sie sie etwas konkreter – z. B. ‚Darf ich KI bei Referaten erlauben?‘ oder ‚Wie bewerte ich ein KI-gestütztes Projekt?‘."
+            },
+            {
+              "id": "k13",
+              "name": "kategorie",
+              "type": "string",
+              "value": "unklar"
             }
           ]
         },
@@ -306,7 +339,7 @@
     },
     {
       "id": "s2",
-      "name": "Notiz ②",
+      "name": "Notiz ③",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -314,7 +347,7 @@
         -120
       ],
       "parameters": {
-        "content": "## ② KI-Kompass beantwortet (Konzept-Suche, Erlass-Suche + Sprachmodell)\nDer Agent durchsucht per Konzept-Suche und Erlass-Suche (offizielle NRW-Quellen) das KI-Konzept (Qdrant, Gemini-Embeddings) bzw. das Landesrecht (Tavily) und antwortet mit Quellenangabe (Seite, Version). Gedächtnis: letzte 6 Nachrichten.",
+        "content": "## ③ KI-Kompass beantwortet (Konzept-Suche, Erlass-Suche + Sprachmodell)\nDer Agent durchsucht per Konzept-Suche und Erlass-Suche (offizielle NRW-Quellen) das KI-Konzept (Qdrant, Gemini-Embeddings) bzw. das Landesrecht (Tavily) und antwortet mit Quellenangabe (Seite, Version). Gedächtnis: letzte 6 Nachrichten.",
         "height": 820,
         "width": 560,
         "color": 5
@@ -322,7 +355,7 @@
     },
     {
       "id": "s3",
-      "name": "Notiz ③",
+      "name": "Notiz ②",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
@@ -330,7 +363,7 @@
         -120
       ],
       "parameters": {
-        "content": "## ③ Sicherheitsprüfung\nJede Frage wird vorab geprüft. Nur erlaubte Fragen gehen an den KI-Kompass; Personenbezug, Benotung, Manipulation und Themenfremdes werden freundlich abgelehnt – ohne dass die Frage das Hauptmodell erreicht. Unklare Fragen führen zur Bitte um eine konkretere Formulierung.",
+        "content": "## ② Sicherheitsprüfung\nJede Frage wird vorab geprüft. Nur erlaubte Fragen gehen an den KI-Kompass; Personenbezug, Benotung, Manipulation und Themenfremdes werden freundlich abgelehnt – ohne dass die Frage das Hauptmodell erreicht. Unklare Fragen führen zur Bitte um eine konkretere Formulierung.",
         "height": 1120,
         "width": 680,
         "color": 3
@@ -342,13 +375,13 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1800,
-        -120
+        2400,
+        -220
       ],
       "parameters": {
-        "content": "## ④ Anonymes Protokoll (Stufe 4)\nPlatzhalter: anonymes Logging in die Data Table für das Dashboard.",
-        "height": 300,
-        "width": 260,
+        "content": "## ④ Anonymes Protokoll\nJede Frage wird anonym protokolliert – nur Kategorie, Thema, Beantwortbarkeit, Zeit und Kennzahlen. Kein Fragetext, keine Namen, keine Sitzungs-ID. Grundlage für das Dashboard der Schulleitung.",
+        "height": 560,
+        "width": 1160,
         "color": 6
       }
     },
@@ -378,6 +411,289 @@
           "name": "Tavily Suche"
         }
       }
+    },
+    {
+      "id": "c15",
+      "name": "Eingang erfassen",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        130,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "eingang_ms",
+              "type": "number",
+              "value": "={{ Date.now() }}"
+            },
+            {
+              "id": "e2",
+              "name": "zeitpunkt",
+              "type": "string",
+              "value": "={{ $now.setZone('Europe/Berlin').startOf('hour').toISO() }}"
+            },
+            {
+              "id": "e3",
+              "name": "version",
+              "type": "string",
+              "value": "v3.0"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "c16",
+      "name": "Kennzahlen Antwort",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1840,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "id": "f2",
+              "name": "kategorie",
+              "type": "string",
+              "value": "erlaubt"
+            },
+            {
+              "id": "f3",
+              "name": "erlass_suche",
+              "type": "boolean",
+              "value": "={{ ($json.intermediateSteps || []).some(s => s.action?.tool === 'Erlass_Suche') }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c17",
+      "name": "Antwortzeit stoppen",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2060,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "g1",
+              "name": "antwortzeit_s",
+              "type": "number",
+              "value": "={{ Math.round((Date.now() - $('Eingang erfassen').first().json.eingang_ms) / 100) / 10 }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "c18",
+      "name": "Antwort senden",
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        2280,
+        0
+      ],
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "webhookId": "e93a00b4-7f40-4d72-acb4-8ce7e3658291"
+    },
+    {
+      "id": "c19",
+      "name": "Erlaubt?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2500,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "i1",
+              "leftValue": "={{ $('Antwortzeit stoppen').first().json.kategorie }}",
+              "rightValue": "erlaubt",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c20",
+      "name": "Auswertung",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "onError": "continueRegularOutput",
+      "position": [
+        2740,
+        -120
+      ],
+      "parameters": {
+        "text": "={{ 'Frage: ' + $('Frage empfangen').first().json.chatInput + '\\n\\nAntwort: ' + $('Antwortzeit stoppen').first().json.output }}",
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"thema\":{\"type\":\"string\",\"enum\":[\"Leistungsbewertung\",\"Ampel & Unterricht\",\"Datenschutz & Tools\",\"Eltern & Schüler\",\"Erlasse NRW\",\"Sonstiges\"],\"description\":\"Thema der Frage\"},\"beantwortbar\":{\"type\":\"boolean\",\"description\":\"false, wenn die Antwort sagt, dass das Konzept die Frage nicht regelt, sonst true\"},\"luecke_stichwort\":{\"type\":\"string\",\"description\":\"Nur wenn beantwortbar false: 2 bis 4 allgemeine Wörter ohne Namen oder Einzelfalldetails, sonst leerer String\"}},\"required\":[\"thema\",\"beantwortbar\",\"luecke_stichwort\"]}",
+        "options": {
+          "systemPromptTemplate": "Du wertest eine Frage einer Lehrkraft und die Antwort des KI-Kompass (KI-Konzept einer Schule) aus. Extrahiere:\n- thema: genau eines aus der Liste, das am besten zur Frage passt. „Erlasse NRW“ nur bei Landesrecht oder Vorgaben des Schulministeriums.\n- beantwortbar: false, wenn die Antwort sagt, dass das KI-Konzept die Frage nicht regelt oder nicht enthält (z. B. Verweis an die AG KI), sonst true.\n- luecke_stichwort: nur wenn beantwortbar false ist: 2 bis 4 allgemeine Wörter zum fehlenden Regelungsthema (z. B. „KI bei Förderplänen“). Keine Namen, keine Klassen, keine Einzelfalldetails, keine Zitate aus der Frage. Sonst leerer String."
+        }
+      }
+    },
+    {
+      "id": "c21",
+      "name": "Protokoll schreiben",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "onError": "continueRegularOutput",
+      "position": [
+        3040,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "nybEy3AUyqCHLXAW",
+          "cachedResultName": "ki_kompass_log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "zeitpunkt": "={{ $('Eingang erfassen').first().json.zeitpunkt }}",
+            "kategorie": "={{ $('Antwortzeit stoppen').first().json.kategorie }}",
+            "thema": "={{ $('Antwortzeit stoppen').first().json.kategorie === 'erlaubt' ? ($json.output?.thema ?? '') : '–' }}",
+            "beantwortbar": "={{ $('Antwortzeit stoppen').first().json.kategorie === 'erlaubt' ? ($json.output?.beantwortbar ?? null) : null }}",
+            "luecke_stichwort": "={{ ($('Antwortzeit stoppen').first().json.kategorie === 'erlaubt' && $json.output?.beantwortbar === false) ? String($json.output.luecke_stichwort ?? '').slice(0, 40) : '' }}",
+            "erlass_suche": "={{ $('Antwortzeit stoppen').first().json.erlass_suche === true }}",
+            "antwortzeit_s": "={{ $('Antwortzeit stoppen').first().json.antwortzeit_s }}",
+            "version": "={{ $('Eingang erfassen').first().json.version }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "zeitpunkt",
+              "displayName": "zeitpunkt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "kategorie",
+              "displayName": "kategorie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "thema",
+              "displayName": "thema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "beantwortbar",
+              "displayName": "beantwortbar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "luecke_stichwort",
+              "displayName": "luecke_stichwort",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "erlass_suche",
+              "displayName": "erlass_suche",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "antwortzeit_s",
+              "displayName": "antwortzeit_s",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "version",
+              "displayName": "version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "feedback",
+              "displayName": "feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      }
     }
   ],
   "connections": {
@@ -385,7 +701,7 @@
       "main": [
         [
           {
-            "node": "Sicherheitsprüfung",
+            "node": "Eingang erfassen",
             "type": "main",
             "index": 0
           }
@@ -397,6 +713,11 @@
         [
           {
             "node": "Sicherheitsprüfung",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auswertung",
             "type": "ai_languageModel",
             "index": 0
           }
@@ -503,10 +824,153 @@
           }
         ]
       ]
+    },
+    "Eingang erfassen": {
+      "main": [
+        [
+          {
+            "node": "Sicherheitsprüfung",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KI-Kompass": {
+      "main": [
+        [
+          {
+            "node": "Kennzahlen Antwort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kennzahlen Antwort": {
+      "main": [
+        [
+          {
+            "node": "Antwortzeit stoppen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort: Personenbezug": {
+      "main": [
+        [
+          {
+            "node": "Antwortzeit stoppen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort: Benotung": {
+      "main": [
+        [
+          {
+            "node": "Antwortzeit stoppen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort: Manipulation": {
+      "main": [
+        [
+          {
+            "node": "Antwortzeit stoppen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort: Themenfremd": {
+      "main": [
+        [
+          {
+            "node": "Antwortzeit stoppen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort: Unklar": {
+      "main": [
+        [
+          {
+            "node": "Antwortzeit stoppen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwortzeit stoppen": {
+      "main": [
+        [
+          {
+            "node": "Antwort senden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort senden": {
+      "main": [
+        [
+          {
+            "node": "Erlaubt?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Erlaubt?": {
+      "main": [
+        [
+          {
+            "node": "Auswertung",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Protokoll schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auswertung": {
+      "main": [
+        [
+          {
+            "node": "Protokoll schreiben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none",
+    "timezone": "Europe/Berlin"
   }
 }
