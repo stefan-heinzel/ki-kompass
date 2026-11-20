@@ -23,7 +23,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1400,
+        1360,
         0
       ],
       "parameters": {
@@ -39,7 +39,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        1272,
+        1340,
         320
       ],
       "parameters": {
@@ -61,7 +61,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
       "position": [
-        1432,
+        1500,
         320
       ],
       "parameters": {
@@ -74,7 +74,7 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.4,
       "position": [
-        1592,
+        1700,
         320
       ],
       "parameters": {
@@ -101,8 +101,8 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
       "typeVersion": 1,
       "position": [
-        1592,
-        544
+        1700,
+        540
       ],
       "parameters": {},
       "credentials": {
@@ -118,7 +118,7 @@
       "type": "@n8n/n8n-nodes-langchain.textClassifier",
       "typeVersion": 1.1,
       "position": [
-        320,
+        650,
         0
       ],
       "parameters": {
@@ -160,7 +160,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        360,
+        650,
         300
       ],
       "parameters": {
@@ -182,8 +182,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        700,
-        200
+        950,
+        160
       ],
       "parameters": {
         "assignments": {
@@ -211,8 +211,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        700,
-        360
+        950,
+        300
       ],
       "parameters": {
         "assignments": {
@@ -240,8 +240,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        700,
-        520
+        950,
+        440
       ],
       "parameters": {
         "assignments": {
@@ -269,8 +269,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        700,
-        680
+        950,
+        580
       ],
       "parameters": {
         "assignments": {
@@ -298,8 +298,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        700,
-        840
+        950,
+        720
       ],
       "parameters": {
         "assignments": {
@@ -327,13 +327,13 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -80,
-        -112
+        -100,
+        -240
       ],
       "parameters": {
         "content": "## ① Frage empfangen\nLehrkräfte stellen ihre Frage im Chat. Begrüßung und Chat-Fenster kommen vom Chat Trigger (noch nicht öffentlich).",
-        "height": 300,
-        "width": 260,
+        "height": 1140,
+        "width": 560,
         "color": 4
       }
     },
@@ -343,13 +343,13 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1200,
-        -120
+        1280,
+        -240
       ],
       "parameters": {
-        "content": "## ③ KI-Kompass beantwortet (Konzept-Suche, Erlass-Suche + Sprachmodell)\nDer Agent durchsucht per Konzept-Suche und Erlass-Suche (offizielle NRW-Quellen) das KI-Konzept (Qdrant, Gemini-Embeddings) bzw. das Landesrecht (Tavily) und antwortet mit Quellenangabe (Seite, Version). Gedächtnis: letzte 6 Nachrichten.",
-        "height": 820,
-        "width": 560,
+        "content": "## ③ KI-Kompass beantwortet (Konzept-Suche, Erlass-Suche + Sprachmodell)\nDer Agent durchsucht per Konzept-Suche und Erlass-Suche (offizielle NRW-Quellen) das KI-Konzept (Qdrant, Gemini-Embeddings) bzw. das Landesrecht (Tavily) und antwortet mit Quellenangabe (Seite, Version). Gedächtnis: letzte 6 Nachrichten. Die Antwort wird gemessen und an den Chat gesendet.",
+        "height": 1140,
+        "width": 1000,
         "color": 5
       }
     },
@@ -359,13 +359,13 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        240,
-        -120
+        560,
+        -240
       ],
       "parameters": {
         "content": "## ② Sicherheitsprüfung\nJede Frage wird vorab geprüft. Nur erlaubte Fragen gehen an den KI-Kompass; Personenbezug, Benotung, Manipulation und Themenfremdes werden freundlich abgelehnt – ohne dass die Frage das Hauptmodell erreicht. Unklare Fragen führen zur Bitte um eine konkretere Formulierung.",
-        "height": 1120,
-        "width": 680,
+        "height": 1140,
+        "width": 620,
         "color": 3
       }
     },
@@ -375,13 +375,13 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2400,
-        -220
+        2380,
+        -240
       ],
       "parameters": {
         "content": "## ④ Anonymes Protokoll\nJede Frage wird anonym protokolliert – nur Kategorie, Thema, Beantwortbarkeit, Zeit und Kennzahlen. Kein Fragetext, keine Namen, keine Sitzungs-ID. Grundlage für das Dashboard der Schulleitung.",
-        "height": 560,
-        "width": 1160,
+        "height": 1140,
+        "width": 800,
         "color": 6
       }
     },
@@ -391,7 +391,7 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.5,
       "position": [
-        1752,
+        2000,
         320
       ],
       "parameters": {
@@ -418,7 +418,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        130,
+        260,
         0
       ],
       "parameters": {
@@ -454,7 +454,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1840,
+        1620,
         0
       ],
       "parameters": {
@@ -489,7 +489,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2060,
+        1840,
         0
       ],
       "parameters": {
@@ -513,7 +513,7 @@
       "type": "@n8n/n8n-nodes-langchain.chat",
       "typeVersion": 1.3,
       "position": [
-        2280,
+        2060,
         0
       ],
       "parameters": {
@@ -528,7 +528,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2500,
+        2480,
         0
       ],
       "parameters": {
@@ -562,8 +562,8 @@
       "typeVersion": 1.2,
       "onError": "continueRegularOutput",
       "position": [
-        2740,
-        -120
+        2730,
+        130
       ],
       "parameters": {
         "text": "={{ 'Frage: ' + $('Frage empfangen').first().json.chatInput + '\\n\\nAntwort: ' + $('Antwortzeit stoppen').first().json.output }}",
@@ -581,7 +581,7 @@
       "typeVersion": 1.1,
       "onError": "continueRegularOutput",
       "position": [
-        3040,
+        2980,
         0
       ],
       "parameters": {
