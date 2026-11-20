@@ -1,6 +1,6 @@
 # AGENTS.md – Regeln für KI-Assistenten (Codex u. a.)
 
-Dieses Repository wird von zwei Personen mit unterschiedlichen KI-Assistenten bearbeitet: Stefan Heinzel mit Claude Code, Julian Hildebrandt mit Codex. **Für alle Assistenten gelten dieselben Regeln.** Die vollständige Projektbeschreibung steht in [`CLAUDE.md`](CLAUDE.md), der aktuelle Projektstand in [`README.md`](README.md). Bei Widersprüchen gilt `CLAUDE.md`.
+Dieses Repository wird von zwei Personen mit unterschiedlichen KI-Assistenten bearbeitet: Stefan Heinzel mit Claude Code, Julian Hildebrandt mit Codex, Marcel Jahn (seit 20.11.). **Für alle Assistenten gelten dieselben Regeln.** Die vollständige Projektbeschreibung steht in [`CLAUDE.md`](CLAUDE.md), der aktuelle Projektstand in [`README.md`](README.md). Bei Widersprüchen gilt `CLAUDE.md`.
 
 ## Projekt in einem Satz
 RAG-basierter KI-Assistent in n8n für die 150 Lehrkräfte einer Gesamtschule in NRW: beantwortet Fragen zum schulischen KI-Konzept mit Quellenangabe, prüft jede Frage vorab (Guardrails), sucht Landesrecht NRW über eine Erlass-Suche und protokolliert anonym für ein Dashboard der Schulleitung. Capstone-Projekt MSIT / IHK-Prüfung „KI-Tool-Experte/-in“.
@@ -15,7 +15,8 @@ RAG-basierter KI-Assistent in n8n für die 150 Lehrkräfte einer Gesamtschule in
 7. **Prompts:** Systemprompts liegen versioniert in `prompts/`. Bei Prompt-Änderungen Workflow und Datei gemeinsam aktualisieren und die Wirkung in `tests/` dokumentieren.
 8. **Beitragslog (`docs/Beitragslog_KI-Kompass.xlsx`):** Excel-Dateien kann Git nicht zusammenführen. Immer erst `git pull`, dann bearbeiten, dann sofort committen und pushen. Nie gleichzeitig mit der anderen Person bearbeiten – vorher kurz absprechen. In Excel bearbeiten (nicht Numbers), damit Auswahllisten und Formeln erhalten bleiben.
 9. **Vor jedem Push:** `git pull`, Dateien auf Schlüssel prüfen, aussagekräftige deutsche Commit-Nachricht.
-10. **Ehrlich dokumentieren:** Testergebnisse nur eintragen, wenn der Lauf tatsächlich stattgefunden hat; Fehler und Abweichungen werden dokumentiert, nicht geglättet.
+10. **Echte Dateien statt Links:** Dokumente immer als Datei ins Repo legen – keine Verknüpfungen (`.url`) oder Links auf Chat- oder Cloud-Ablagen (laufen ab, enthalten Zugriffsschlüssel).
+11. **Ehrlich dokumentieren:** Testergebnisse nur eintragen, wenn der Lauf tatsächlich stattgefunden hat; Fehler und Abweichungen werden dokumentiert, nicht geglättet.
 
 ## Ordner
 | Ordner | Inhalt |
