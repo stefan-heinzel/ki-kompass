@@ -2,7 +2,7 @@
 
 RAG-basierter KI-Assistent (n8n) für die 150 Lehrkräfte einer Gesamtschule in NRW. Er beantwortet Fragen zum verbindlichen schulischen KI-Konzept (62 Seiten) – jede Aussage mit Quellenangabe und Seitenzahl. Geplant sind außerdem Guardrails (keine Benotung, keine personenbezogenen Daten), eine Erlass-Suche für NRW und ein anonymes Nutzungs-Dashboard für die Schulleitung.
 
-_Capstone-Projekt AI Automations & Agents (MSIT München / IHK „KI-Tool-Experte“) · Stefan Heinzel & Julian Hildebrandt · Stand: 20.11.2026_
+_Capstone-Projekt AI Automations & Agents (MSIT München / IHK „KI-Tool-Experte“) · Stefan Heinzel & Julian Hildebrandt · Stand: 22.11.2026_
 
 ---
 
@@ -32,7 +32,7 @@ Drei getrennte n8n-Workflows, die nur über zwei Datenspeicher verbunden sind:
 |---|---|---|---|
 | **WF1 · Wissensbasis Ingest** | Admin (Upload-Formular mit Passwort) | PDF seitenweise einlesen, in Abschnitte zerlegen, als Vektoren speichern; alte Version wird vorher ersetzt | schreibt in **Qdrant** (`ki_konzept`) |
 | **WF2 · KI-Kompass Chat** | Lehrkraft (Chat) | Sicherheitsprüfung jeder Frage, dann Antwort mit Quelle aus Konzept-Suche und Erlass-Suche (offizielle NRW-Quellen) | liest aus **Qdrant**, schreibt später ins **Protokoll** |
-| **WF3 · Dashboard** _(geplant)_ | Schulleitung | anonyme Nutzungsstatistik als Webseite | liest aus dem **Protokoll** (n8n Data Table) |
+| **WF3 · Dashboard** | Schulleitung (Webseite mit Passwort) | anonyme, zusammengefasste Nutzungsstatistik: Themen, Beantwortbarkeit, Konzeptlücken, Sicherheitsprüfung, Spitzenzeiten | liest aus dem **Protokoll** (n8n Data Table) |
 
 **Eingesetzte Dienste**
 
@@ -56,7 +56,7 @@ Detailliertes Architekturdokument: [`docs/Architektur_KI-Kompass.pdf`](docs/Arch
 | WF2 Stufe 2: Guardrails | ✅ fertig, getestet (7/7 Guardrail-Fälle, 0 Fehlalarme) |
 | WF2 Stufe 3: Erlass-Suche (Tavily) | ✅ fertig, getestet (5/5, Median 6,7 s) |
 | WF2 Stufe 4: anonymes Protokoll | ✅ fertig, getestet (4/4, keine Fragetexte oder Namen) |
-| WF3 Dashboard | 🔧 in Arbeit |
+| WF3 Dashboard | ✅ fertig, getestet (8/9, Gegenprobe ohne Passwort offen); mit gekennzeichneten Demodaten |
 
 ## Startanleitung
 
@@ -82,6 +82,7 @@ In n8n unter **Overview → Credentials → Create Credential**. Die Namen exakt
 | `Qdrant KI-Kompass` | Qdrant API | API-Key und Cluster-URL **mit** `:6333`. Unter „Allowed HTTP Request Domains“ die **exakte** Cluster-Adresse eintragen (z. B. `xxxx.eu-central-1-0.aws.cloud.qdrant.io`), nicht nur `cloud.qdrant.io` – sonst lehnt n8n die HTTP-Aufrufe in WF1 ab. |
 | `Gemini - Embeddings` | Google Gemini (PaLM) API | Gemini-API-Key |
 | `OpenRouter - n8n` | OpenRouter | OpenRouter-API-Key |
+| `Dashboard Schulleitung` | Basic Auth | Benutzer `schulleitung`, eigenes sicheres Passwort; Allowed HTTP Request Domains = None |
 | `Tavily Suche` | Header Auth | Name `Authorization`, Wert `Bearer <Tavily-Key>`; erlaubte Domain `api.tavily.com` |
 
 ### 3. Workflows importieren
@@ -113,6 +114,12 @@ In n8n unter **Overview → Credentials → Create Credential**. Die Namen exakt
 
 Die Workflows bleiben im Testmodus (nicht veröffentlicht). Für den Produktivbetrieb würde WF2 über **Publish** mit einem öffentlichen Chat-Link bereitgestellt.
 
+### 6. Dashboard testen (WF3)
+
+1. Credential `Dashboard Schulleitung` anlegen (siehe Schritt 2) und [`workflows/wf3_dashboard.json`](workflows/wf3_dashboard.json) importieren.
+2. Im Editor unten auf **„Execute workflow“** klicken und **sofort** `https://<ihre-instanz>.app.n8n.cloud/webhook-test/ki-kompass-dashboard` im Browser öffnen (die Test-URL gilt nur für einen Aufruf).
+3. Mit `schulleitung` und dem Passwort anmelden. Erwartet: Kennzahlen, Diagramme und Listen; nur zusammengefasste Werte, keine Einzelzeilen.
+
 ## Evidenz
 
 | Nachweis | Datei |
@@ -122,6 +129,7 @@ Die Workflows bleiben im Testmodus (nicht veröffentlicht). Für den Produktivbe
 | Guardrail-Tests (12/12) | [`tests/ergebnisse_wf2_stufe2.md`](tests/ergebnisse_wf2_stufe2.md) |
 | Erlass-Suche und Regression (5/5), Konzept-Unschärfen | [`tests/ergebnisse_wf2_stufe3.md`](tests/ergebnisse_wf2_stufe3.md) |
 | Anonymes Protokoll (4/4), Restrisiko Systemzeiten | [`tests/ergebnisse_wf2_stufe4.md`](tests/ergebnisse_wf2_stufe4.md) |
+| Dashboard (WF3) | [`tests/ergebnisse_wf3.md`](tests/ergebnisse_wf3.md) |
 | Systemprompt (versioniert) | [`prompts/wf2_systemprompt.md`](prompts/wf2_systemprompt.md) |
 | Individuelle Beiträge mit Gegenprüfung | [`docs/Beitragslog_KI-Kompass.xlsx`](docs/Beitragslog_KI-Kompass.xlsx) |
 | Use Case und 4-Satz-Brief | [`docs/KI-Kompass_Use-Case_4-Satz-Brief.pdf`](docs/KI-Kompass_Use-Case_4-Satz-Brief.pdf) |
@@ -132,7 +140,8 @@ Die Workflows bleiben im Testmodus (nicht veröffentlicht). Für den Produktivbe
 - **Fehlerbehandlung WF1:** Index- oder Löschfehler stoppen den Workflow vor dem Speichern („Abbruch: …“). Toleriert wird nur „Collection existiert noch nicht“ beim allerersten Lauf.
 - **Gedächtnis:** Innerhalb einer Chat-Sitzung wachsen die Tokens pro Frage (gemessen 15 → 36 → 58 Tsd.). Gedächtnisfenster wird noch angepasst.
 - **Kosten:** Die Kosten pro Frage hängen vor allem an der Menge der gefundenen Abschnitte (Top-K = 5), nicht an der Antwortlänge.
-- **Dashboard** ist noch nicht umgesetzt (siehe Projektstand).
+- **Dashboard-Daten:** Die Tabelle enthält derzeit Demozeilen (`version = demo`), im Dashboard deutlich gekennzeichnet. Vor dem Echtbetrieb löschen und `MIN_ANZAHL` im Node „Kennzahlen berechnen“ auf 3 setzen.
+- **Basic Auth in Tests:** n8n zeigt in Test-Ausführungen den Header `authorization` (nur Base64, rückrechenbar). Screenshots von Webhook-Tests nicht weitergeben.
 - **Protokoll:** Die n8n Data Table legt automatisch sekundengenaue Spalten `createdAt`/`updatedAt` an. Die Rohtabelle ist daher nur für Admins zugänglich; das Dashboard zeigt nur gerundete, aggregierte Werte.
 - **Node-Namen der Werkzeuge** (`Konzept_Suche`, `Erlass_Suche`) dürfen keine Bindestriche enthalten – n8n nutzt sie als Tool-Namen.
 - **Speichern im n8n-Editor** kann Parameter entfernen, die im aktuellen Node-Schema nicht angezeigt werden (z. B. Top-K). Nach Änderungen im Editor den Export mit dem Live-Stand vergleichen.
