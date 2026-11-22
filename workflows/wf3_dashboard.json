@@ -1,0 +1,163 @@
+{
+  "name": "WF3 · Dashboard",
+  "nodes": [
+    {
+      "id": "n-webhook",
+      "name": "Dashboard aufrufen",
+      "webhookId": "1ef8ad22-22ce-4dd5-9898-2540aedc999b",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [0, 300],
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "ki-kompass-dashboard",
+        "authentication": "basicAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "1mp0Xp7qHYOreHWZ",
+          "name": "Dashboard Schulleitung"
+        }
+      }
+    },
+    {
+      "id": "n-daten",
+      "name": "Daten lesen",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [320, 300],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "nybEy3AUyqCHLXAW",
+          "cachedResultName": "ki_kompass_log"
+        },
+        "returnAll": true
+      }
+    },
+    {
+      "id": "n-kenn",
+      "name": "Kennzahlen berechnen",
+      "notes": "Why Code: Median, Gruppierung, Zeitzonen-Auswertung (Wochentag/Stunde) und Aggregation über alle Zeilen; kein Standard-Node deckt das ab. Ausgabe nur Zusammenfassungen, keine Einzelzeilen.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// Kennzahlen der letzten 30 Tage (Zeitzone Europe/Berlin). Ausgabe: nur Zusammenfassungen.\nconst MIN_ANZAHL = 1; // Mindesthäufigkeit für „Nicht im Konzept geregelt“\nconst TZ = 'Europe/Berlin';\nconst TAGE = 30;\nconst jetzt = new Date();\nconst grenze = jetzt.getTime() - TAGE * 86400000;\nconst zeilen = $input.all().map(i => i.json).filter(r => r.zeitpunkt && new Date(r.zeitpunkt).getTime() >= grenze);\nconst zaehle = (liste, fn) => { const m = new Map(); liste.forEach(x => { const k = fn(x); if (k) m.set(k, (m.get(k) || 0) + 1); }); return m; };\nconst sortiert = m => [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'de'));\nconst erlaubt = zeilen.filter(r => r.kategorie === 'erlaubt');\nconst zeiten = erlaubt.map(r => Number(r.antwortzeit_s)).filter(v => Number.isFinite(v)).sort((a, b) => a - b);\nlet median = null;\nif (zeiten.length) { const h = Math.floor(zeiten.length / 2); median = zeiten.length % 2 ? zeiten[h] : (zeiten[h - 1] + zeiten[h]) / 2; }\nconst beantwortbar = erlaubt.filter(r => r.beantwortbar === true).length;\nconst themen = sortiert(zaehle(zeilen, r => { const t = String(r.thema || '').trim(); return t && t !== '–' ? t : null; })).map(([name, anzahl]) => ({ name, anzahl }));\nconst luecken = new Map();\nerlaubt.filter(r => r.beantwortbar === false).forEach(r => { const s = String(r.luecke_stichwort || '').trim(); if (!s) return; const k = s.toLowerCase(); const e = luecken.get(k) || { stichwort: s, anzahl: 0 }; e.anzahl++; luecken.set(k, e); });\nconst lueckenListe = [...luecken.values()].filter(e => e.anzahl >= MIN_ANZAHL).sort((a, b) => b.anzahl - a.anzahl || a.stichwort.localeCompare(b.stichwort, 'de'));\nconst KATS = ['personenbezug', 'benotung', 'manipulation', 'themenfremd', 'unklar'];\nconst sicherheit = KATS.map(k => ({ kategorie: k, anzahl: zeilen.filter(r => r.kategorie === k).length }));\nconst fmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', hour: 'numeric', hourCycle: 'h23' });\nconst WT = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };\nconst wochentage = Array(7).fill(0);\nconst stunden = Array(24).fill(0);\nzeilen.forEach(r => { const p = Object.fromEntries(fmt.formatToParts(new Date(r.zeitpunkt)).map(x => [x.type, x.value])); wochentage[WT[p.weekday]]++; stunden[Number(p.hour) % 24]++; });\nconst positiv = zeilen.filter(r => r.feedback === 'positiv').length;\nconst negativ = zeilen.filter(r => r.feedback === 'negativ').length;\nconst stand = new Intl.DateTimeFormat('de-DE', { timeZone: TZ, dateStyle: 'medium', timeStyle: 'short' }).format(jetzt);\nreturn [{ json: {\n  stand,\n  tage: TAGE,\n  demo: zeilen.some(r => r.version === 'demo'),\n  gesamt: zeilen.length,\n  anteilBeantwortbar: erlaubt.length ? Math.round(100 * beantwortbar / erlaubt.length) : null,\n  medianS: median === null ? null : Math.round(median * 10) / 10,\n  erlassAnzahl: zeilen.filter(r => r.erlass_suche === true).length,\n  themen,\n  luecken: lueckenListe,\n  sicherheit,\n  wochentage,\n  stunden,\n  feedback: { positiv, negativ, quote: positiv + negativ ? Math.round(100 * positiv / (positiv + negativ)) : null }\n} }];"
+      }
+    },
+    {
+      "id": "n-seite",
+      "name": "Seite bauen",
+      "notes": "Why Code: baut ein einziges HTML-Dokument aus den Kennzahlen (Template, Chart.js-Einbindung); kein Standard-Node erzeugt das. Die Seite enthält nur Zusammenfassungen.",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// Baut die HTML-Seite aus den Kennzahlen (nur Zusammenfassungen, keine Einzelzeilen).\nconst d = $input.first().json;\nconst daten = JSON.stringify(d).replace(/</g, String.fromCharCode(92) + 'u003c');\nconst html = `<!doctype html>\n<html lang='de'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'>\n<title>KI-Kompass · Nutzung</title>\n<style>\n:root{color-scheme:light;--bg:#f4f6f9;--card:#fff;--text:#18212c;--mut:#566273;--line:#dfe4ea;--acc:#2563c9;--wb:#fff3d6;--wt:#7a4a00}\n@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#0f141b;--card:#18202a;--text:#e9edf2;--mut:#9ba7b6;--line:#2a3441;--acc:#6ea8ff;--wb:#3b2d10;--wt:#ffd58a}}\n:root[data-theme=dark]{color-scheme:dark;--bg:#0f141b;--card:#18202a;--text:#e9edf2;--mut:#9ba7b6;--line:#2a3441;--acc:#6ea8ff;--wb:#3b2d10;--wt:#ffd58a}\n*{box-sizing:border-box}\nbody{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}\nmain{max-width:1100px;margin:0 auto;padding:20px 16px 32px}\nheader{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}\nh1{margin:0;font-size:1.7rem}\n.sub{color:var(--mut);margin:4px 0 0}\nbutton{font:inherit;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer}\n.demo{background:var(--wb);color:var(--wt);border:2px solid var(--wt);border-radius:10px;padding:12px 16px;margin:16px 0;font-weight:700}\n.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:20px 0}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}\n.card .v{font-size:1.8rem;font-weight:700;line-height:1.25;overflow-wrap:anywhere}\n.card .l{color:var(--mut);font-size:.9rem}\n.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px;margin-bottom:12px}\nh2{font-size:1.1rem;margin:0 0 10px}\n.ch{position:relative;height:260px}\nul{list-style:none;margin:0;padding:0}\nli{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}\nli:last-child{border:0}\n.n{font-weight:700;font-variant-numeric:tabular-nums}\n.hint{color:var(--mut);font-size:.9rem;margin:0 0 8px}\nfooter{color:var(--mut);font-size:.85rem;margin-top:20px}\n</style></head><body><main>\n<header><div><h1>KI-Kompass · Nutzung</h1><p class='sub'>Letzte 30 Tage · anonym, ohne Namen</p></div><button id='tg' type='button'>Hell / Dunkel</button></header>\n<div id='demo' class='demo' hidden>⚠ Enthält Demodaten – die Zahlen sind nicht echt.</div>\n<section class='tiles' id='tiles'></section>\n<section class='grid'><div class='card'><h2>Fragen nach Thema</h2><div class='ch'><canvas id='c1'></canvas></div></div></section>\n<section class='grid'><div class='card'><h2>Spitzenzeiten: Wochentag</h2><div class='ch'><canvas id='c2'></canvas></div></div><div class='card'><h2>Spitzenzeiten: Uhrzeit (Stunde)</h2><div class='ch'><canvas id='c3'></canvas></div></div></section>\n<section class='grid'><div class='card'><h2>Nicht im Konzept geregelt → Hinweis an die AG KI</h2><p class='hint'>Fragen, die das Konzept nicht beantwortet, nach Stichwort.</p><ul id='lk'></ul></div><div class='card'><h2>Sicherheitsprüfung</h2><p class='hint'>Abgelehnte oder umgeleitete Fragen nach Grund.</p><ul id='sk'></ul></div></section>\n<footer id='st'></footer>\n</main>\n<script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js'></script>\n<script type='application/json' id='d'>${daten}</script>\n<script>\nvar D=JSON.parse(document.getElementById('d').textContent);\nfunction esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}\nfunction tile(v,l){return '<div class=card><div class=v>'+v+'</div><div class=l>'+l+'</div></div>'}\nvar fb=D.feedback;\nvar med=D.medianS===null?'–':String(D.medianS).replace('.',',')+' s';\ndocument.getElementById('tiles').innerHTML=tile(D.gesamt,'Fragen gesamt')+tile(D.anteilBeantwortbar===null?'–':D.anteilBeantwortbar+' %','Anteil beantwortbar')+tile(med,'Median Antwortzeit')+tile(D.erlassAnzahl,'Erlass-Suche genutzt')+tile(fb.quote===null?'noch keine Daten':fb.quote+' %','Daumen hoch ('+(fb.positiv+fb.negativ)+' Bewertungen)');\nif(D.demo)document.getElementById('demo').hidden=false;\nfunction liste(id,arr,f){document.getElementById(id).innerHTML=arr.length?arr.map(f).join(''):'<li>Keine Einträge im Zeitraum.</li>'}\nliste('lk',D.luecken,function(e){return '<li><span>'+esc(e.stichwort)+'</span><span class=n>'+e.anzahl+'×</span></li>'});\nvar NAMEN={personenbezug:'Personenbezug erkannt',benotung:'Benotungsanfrage abgelehnt',manipulation:'Manipulationsversuch abgewehrt',themenfremd:'Themenfremde Frage',unklar:'Unklare Frage'};\nliste('sk',D.sicherheit,function(e){return '<li><span>'+esc(NAMEN[e.kategorie]||e.kategorie)+'</span><span class=n>'+e.anzahl+'</span></li>'});\ndocument.getElementById('st').textContent='Stand: '+D.stand+' (Europe/Berlin)';\nvar charts=[];\nfunction cv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}\nfunction bar(id,labels,data,horiz){var c=new Chart(document.getElementById(id),{type:'bar',data:{labels:labels,datasets:[{data:data,backgroundColor:cv('--acc'),borderRadius:4}]},options:{indexAxis:horiz?'y':'x',responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{color:cv('--mut'),precision:0},grid:{color:cv('--line')}},y:{beginAtZero:true,ticks:{color:cv('--mut'),precision:0},grid:{color:cv('--line')}}}}});charts.push(c)}\nfunction draw(){\n if(!window.Chart)return;\n charts.forEach(function(c){c.destroy()});charts=[];\n bar('c1',D.themen.map(function(t){return t.name}),D.themen.map(function(t){return t.anzahl}),true);\n bar('c2',['Mo','Di','Mi','Do','Fr','Sa','So'],D.wochentage,false);\n bar('c3',D.stunden.map(function(_,i){return String(i)}),D.stunden,false);\n}\nfunction dark(){var t=document.documentElement.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches}\ntry{var s=localStorage.getItem('kk-theme');if(s)document.documentElement.setAttribute('data-theme',s)}catch(e){}\ndocument.getElementById('tg').onclick=function(){var n=dark()?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('kk-theme',n)}catch(e){}draw()};\nmatchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);\ndraw();\n</script></body></html>`;\nreturn [{ json: { html } }];"
+      }
+    },
+    {
+      "id": "n-resp",
+      "name": "Seite ausliefern",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [1280, 300],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "s1",
+      "name": "Notiz ①",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-40, 120],
+      "parameters": {
+        "content": "## ① Aufruf durch die Schulleitung\nGET /ki-kompass-dashboard, geschützt mit Passwort (Basic Auth, Credential „Dashboard Schulleitung“).",
+        "height": 340,
+        "width": 260,
+        "color": 4
+      }
+    },
+    {
+      "id": "s2",
+      "name": "Notiz ②",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [280, 120],
+      "parameters": {
+        "content": "## ② Daten lesen\nAlle Zeilen der Data Table ki_kompass_log. Nur die Projektspalten werden genutzt.",
+        "height": 340,
+        "width": 260,
+        "color": 5
+      }
+    },
+    {
+      "id": "s3",
+      "name": "Notiz ③",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [600, 120],
+      "parameters": {
+        "content": "## ③ Kennzahlen berechnen\nLetzte 30 Tage, Europe/Berlin. Nur Zusammenfassungen, keine Einzelzeilen. MIN_ANZAHL steuert die Mindesthäufigkeit der Lücken-Stichworte.",
+        "height": 340,
+        "width": 260,
+        "color": 6
+      }
+    },
+    {
+      "id": "s4",
+      "name": "Notiz ④",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [920, 120],
+      "parameters": {
+        "content": "## ④ Webseite ausliefern\nEin HTML-Dokument (Chart.js vom CDN, Hell/Dunkel automatisch plus Umschalter) wird als text/html zurückgegeben.",
+        "height": 340,
+        "width": 560,
+        "color": 3
+      }
+    }
+  ],
+  "connections": {
+    "Dashboard aufrufen": {
+      "main": [[{ "node": "Daten lesen", "type": "main", "index": 0 }]]
+    },
+    "Daten lesen": {
+      "main": [[{ "node": "Kennzahlen berechnen", "type": "main", "index": 0 }]]
+    },
+    "Kennzahlen berechnen": {
+      "main": [[{ "node": "Seite bauen", "type": "main", "index": 0 }]]
+    },
+    "Seite bauen": {
+      "main": [[{ "node": "Seite ausliefern", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "timezone": "Europe/Berlin",
+    "executionOrder": "v1"
+  }
+}
