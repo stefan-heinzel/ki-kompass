@@ -1,6 +1,6 @@
 # AGENTS.md – Regeln für KI-Assistenten (Codex u. a.)
 
-Dieses Repository wird von zwei Personen mit unterschiedlichen KI-Assistenten bearbeitet: Stefan Heinzel mit Claude Code, Julian Hildebrandt mit Codex, Marcel Jahn (seit 20.11.). **Für alle Assistenten gelten dieselben Regeln.** Die vollständige Projektbeschreibung steht in [`CLAUDE.md`](CLAUDE.md), der aktuelle Projektstand in [`README.md`](README.md). Bei Widersprüchen gilt `CLAUDE.md`.
+Dieses Repository wird von zwei Personen mit unterschiedlichen KI-Assistenten bearbeitet: Stefan Heinzel mit Claude Code, Julian Hildebrandt mit Codex. **Für alle Assistenten gelten dieselben Regeln.** Die vollständige Projektbeschreibung steht in [`CLAUDE.md`](CLAUDE.md), der aktuelle Projektstand in [`README.md`](README.md). Bei Widersprüchen gilt `CLAUDE.md`.
 
 ## Projekt in einem Satz
 RAG-basierter KI-Assistent in n8n für die 150 Lehrkräfte einer Gesamtschule in NRW: beantwortet Fragen zum schulischen KI-Konzept mit Quellenangabe, prüft jede Frage vorab (Guardrails), sucht Landesrecht NRW über eine Erlass-Suche und protokolliert anonym für ein Dashboard der Schulleitung. Capstone-Projekt MSIT / IHK-Prüfung „KI-Tool-Experte/-in“.
