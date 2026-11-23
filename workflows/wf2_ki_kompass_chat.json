@@ -12,8 +12,17 @@
       ],
       "webhookId": "249153fb-5a87-4ac0-96f3-909529a75c41",
       "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "authentication": "basicAuth",
         "options": {
-          "responseMode": "responseNodes"
+          "responseMode": "responseNode"
+        }
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "qCQfVVfrluAQlpf9",
+          "name": "Chat Lehrkräfte"
         }
       }
     },
@@ -510,17 +519,19 @@
     {
       "id": "c18",
       "name": "Antwort senden",
-      "type": "@n8n/n8n-nodes-langchain.chat",
-      "typeVersion": 1.3,
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
       "position": [
         2060,
         0
       ],
       "parameters": {
-        "message": "={{ $json.output }}",
-        "options": {}
-      },
-      "webhookId": "e93a00b4-7f40-4d72-acb4-8ce7e3658291"
+        "respondWith": "json",
+        "responseBody": "={{ { output: $json.output } }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
     },
     {
       "id": "c19",

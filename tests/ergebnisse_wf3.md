@@ -15,7 +15,7 @@
 | D06 | Sicherheitsprüfung | Anzahl je Ablehnungsgrund | 5 Kategorien angezeigt | ✅ |
 | D07 | Keine Einzelzeilen | nur Zusammenfassungen, kein Zeitstempel einzelner Fragen | erfüllt | ✅ |
 | D08 | Hell/Dunkel-Umschalter | Wechsel funktioniert | funktioniert | ✅ |
-| D09 | Aufruf ohne bzw. mit falschem Passwort (privates Fenster) | Zugriff verweigert | _offen_ | ⏳ |
+| D09 | Aufruf ohne bzw. mit falschem Passwort (privates Fenster) | Zugriff verweigert | _offen – Gegenprüfung durch Julian am 23.11._ | ⏳ |
 
 ## Befunde
 

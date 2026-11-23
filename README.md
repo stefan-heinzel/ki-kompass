@@ -2,7 +2,7 @@
 
 RAG-basierter KI-Assistent (n8n) für die 150 Lehrkräfte einer Gesamtschule in NRW. Er beantwortet Fragen zum verbindlichen schulischen KI-Konzept (62 Seiten) – jede Aussage mit Quellenangabe und Seitenzahl. Geplant sind außerdem Guardrails (keine Benotung, keine personenbezogenen Daten), eine Erlass-Suche für NRW und ein anonymes Nutzungs-Dashboard für die Schulleitung.
 
-_Capstone-Projekt AI Automations & Agents (MSIT München / IHK „KI-Tool-Experte“) · Stefan Heinzel & Julian Hildebrandt · Stand: 22.11.2026_
+_Capstone-Projekt AI Automations & Agents (MSIT München / IHK „KI-Tool-Experte“) · Stefan Heinzel & Julian Hildebrandt · Stand: 23.11.2026_
 
 ---
 
@@ -32,6 +32,7 @@ Drei getrennte n8n-Workflows, die nur über zwei Datenspeicher verbunden sind:
 |---|---|---|---|
 | **WF1 · Wissensbasis Ingest** | Admin (Upload-Formular mit Passwort) | PDF seitenweise einlesen, in Abschnitte zerlegen, als Vektoren speichern; alte Version wird vorher ersetzt | schreibt in **Qdrant** (`ki_konzept`) |
 | **WF2 · KI-Kompass Chat** | Lehrkraft (Chat) | Sicherheitsprüfung jeder Frage, dann Antwort mit Quelle aus Konzept-Suche und Erlass-Suche (offizielle NRW-Quellen) | liest aus **Qdrant**, schreibt später ins **Protokoll** |
+| **WF4 · Chat-Oberfläche** | Lehrkraft (Browser) | eigene Chat-Seite mit Beispielfragen, Hell/Dunkel und Daumen-Feedback; leitet Fragen serverseitig an WF2 weiter | schreibt Feedback ins **Protokoll** |
 | **WF3 · Dashboard** | Schulleitung (Webseite mit Passwort) | anonyme, zusammengefasste Nutzungsstatistik: Themen, Beantwortbarkeit, Konzeptlücken, Sicherheitsprüfung, Spitzenzeiten | liest aus dem **Protokoll** (n8n Data Table) |
 
 **Eingesetzte Dienste**
@@ -56,6 +57,7 @@ Detailliertes Architekturdokument: [`docs/Architektur_KI-Kompass.pdf`](docs/Arch
 | WF2 Stufe 2: Guardrails | ✅ fertig, getestet (7/7 Guardrail-Fälle, 0 Fehlalarme) |
 | WF2 Stufe 3: Erlass-Suche (Tavily) | ✅ fertig, getestet (5/5, Median 6,7 s) |
 | WF2 Stufe 4: anonymes Protokoll | ✅ fertig, getestet (4/4, keine Fragetexte oder Namen) |
+| WF4 Chat-Oberfläche für Lehrkräfte | ✅ fertig, getestet (7/7); Demo ohne Anmeldung |
 | WF3 Dashboard | ✅ fertig, getestet (8/9, Gegenprobe ohne Passwort offen); mit gekennzeichneten Demodaten |
 
 ## Startanleitung
@@ -130,6 +132,7 @@ Die Workflows bleiben im Testmodus (nicht veröffentlicht). Für den Produktivbe
 | Erlass-Suche und Regression (5/5), Konzept-Unschärfen | [`tests/ergebnisse_wf2_stufe3.md`](tests/ergebnisse_wf2_stufe3.md) |
 | Anonymes Protokoll (4/4), Restrisiko Systemzeiten | [`tests/ergebnisse_wf2_stufe4.md`](tests/ergebnisse_wf2_stufe4.md) |
 | Dashboard (WF3) | [`tests/ergebnisse_wf3.md`](tests/ergebnisse_wf3.md) |
+| Chat-Oberfläche (WF4), Fehlerfälle Sandbox/CORS/Antwortmodus | [`tests/ergebnisse_wf4.md`](tests/ergebnisse_wf4.md) |
 | Systemprompt (versioniert) | [`prompts/wf2_systemprompt.md`](prompts/wf2_systemprompt.md) |
 | Individuelle Beiträge mit Gegenprüfung | [`docs/Beitragslog_KI-Kompass.xlsx`](docs/Beitragslog_KI-Kompass.xlsx) |
 | Use Case und 4-Satz-Brief | [`docs/KI-Kompass_Use-Case_4-Satz-Brief.pdf`](docs/KI-Kompass_Use-Case_4-Satz-Brief.pdf) |
@@ -140,6 +143,7 @@ Die Workflows bleiben im Testmodus (nicht veröffentlicht). Für den Produktivbe
 - **Fehlerbehandlung WF1:** Index- oder Löschfehler stoppen den Workflow vor dem Speichern („Abbruch: …“). Toleriert wird nur „Collection existiert noch nicht“ beim allerersten Lauf.
 - **Gedächtnis:** Innerhalb einer Chat-Sitzung wachsen die Tokens pro Frage (gemessen 15 → 36 → 58 Tsd.). Gedächtnisfenster wird noch angepasst.
 - **Kosten:** Die Kosten pro Frage hängen vor allem an der Menge der gefundenen Abschnitte (Top-K = 5), nicht an der Antwortlänge.
+- **Chat-Oberfläche (WF4):** Für Prototyp und Demo ohne Anmeldung; Zugriff begrenzt durch Pfad mit zufälligem Suffix (Export enthält Platzhalter `<SUFFIX>`), Kostenlimit und Veröffentlichung nur zu Test-/Demozeiten. Im Echtbetrieb Anmeldung über die schulische Plattform. n8n liefert Webhook-Seiten in einer Sandbox aus (Origin „null“), daher sind die beiden Webhooks der Seite für CORS offen.
 - **Dashboard-Daten:** Die Tabelle enthält derzeit Demozeilen (`version = demo`), im Dashboard deutlich gekennzeichnet. Vor dem Echtbetrieb löschen und `MIN_ANZAHL` im Node „Kennzahlen berechnen“ auf 3 setzen.
 - **Basic Auth in Tests:** n8n zeigt in Test-Ausführungen den Header `authorization` (nur Base64, rückrechenbar). Screenshots von Webhook-Tests nicht weitergeben.
 - **Protokoll:** Die n8n Data Table legt automatisch sekundengenaue Spalten `createdAt`/`updatedAt` an. Die Rohtabelle ist daher nur für Admins zugänglich; das Dashboard zeigt nur gerundete, aggregierte Werte.

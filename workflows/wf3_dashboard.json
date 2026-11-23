@@ -7,7 +7,10 @@
       "webhookId": "1ef8ad22-22ce-4dd5-9898-2540aedc999b",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.2,
-      "position": [0, 300],
+      "position": [
+        0,
+        300
+      ],
       "parameters": {
         "httpMethod": "GET",
         "path": "ki-kompass-dashboard",
@@ -28,7 +31,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "alwaysOutputData": true,
-      "position": [320, 300],
+      "position": [
+        320,
+        300
+      ],
       "parameters": {
         "resource": "row",
         "operation": "get",
@@ -47,11 +53,14 @@
       "notes": "Why Code: Median, Gruppierung, Zeitzonen-Auswertung (Wochentag/Stunde) und Aggregation über alle Zeilen; kein Standard-Node deckt das ab. Ausgabe nur Zusammenfassungen, keine Einzelzeilen.",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [640, 300],
+      "position": [
+        640,
+        300
+      ],
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "// Kennzahlen der letzten 30 Tage (Zeitzone Europe/Berlin). Ausgabe: nur Zusammenfassungen.\nconst MIN_ANZAHL = 1; // Mindesthäufigkeit für „Nicht im Konzept geregelt“\nconst TZ = 'Europe/Berlin';\nconst TAGE = 30;\nconst jetzt = new Date();\nconst grenze = jetzt.getTime() - TAGE * 86400000;\nconst zeilen = $input.all().map(i => i.json).filter(r => r.zeitpunkt && new Date(r.zeitpunkt).getTime() >= grenze);\nconst zaehle = (liste, fn) => { const m = new Map(); liste.forEach(x => { const k = fn(x); if (k) m.set(k, (m.get(k) || 0) + 1); }); return m; };\nconst sortiert = m => [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'de'));\nconst erlaubt = zeilen.filter(r => r.kategorie === 'erlaubt');\nconst zeiten = erlaubt.map(r => Number(r.antwortzeit_s)).filter(v => Number.isFinite(v)).sort((a, b) => a - b);\nlet median = null;\nif (zeiten.length) { const h = Math.floor(zeiten.length / 2); median = zeiten.length % 2 ? zeiten[h] : (zeiten[h - 1] + zeiten[h]) / 2; }\nconst beantwortbar = erlaubt.filter(r => r.beantwortbar === true).length;\nconst themen = sortiert(zaehle(zeilen, r => { const t = String(r.thema || '').trim(); return t && t !== '–' ? t : null; })).map(([name, anzahl]) => ({ name, anzahl }));\nconst luecken = new Map();\nerlaubt.filter(r => r.beantwortbar === false).forEach(r => { const s = String(r.luecke_stichwort || '').trim(); if (!s) return; const k = s.toLowerCase(); const e = luecken.get(k) || { stichwort: s, anzahl: 0 }; e.anzahl++; luecken.set(k, e); });\nconst lueckenListe = [...luecken.values()].filter(e => e.anzahl >= MIN_ANZAHL).sort((a, b) => b.anzahl - a.anzahl || a.stichwort.localeCompare(b.stichwort, 'de'));\nconst KATS = ['personenbezug', 'benotung', 'manipulation', 'themenfremd', 'unklar'];\nconst sicherheit = KATS.map(k => ({ kategorie: k, anzahl: zeilen.filter(r => r.kategorie === k).length }));\nconst fmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', hour: 'numeric', hourCycle: 'h23' });\nconst WT = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };\nconst wochentage = Array(7).fill(0);\nconst stunden = Array(24).fill(0);\nzeilen.forEach(r => { const p = Object.fromEntries(fmt.formatToParts(new Date(r.zeitpunkt)).map(x => [x.type, x.value])); wochentage[WT[p.weekday]]++; stunden[Number(p.hour) % 24]++; });\nconst positiv = zeilen.filter(r => r.feedback === 'positiv').length;\nconst negativ = zeilen.filter(r => r.feedback === 'negativ').length;\nconst stand = new Intl.DateTimeFormat('de-DE', { timeZone: TZ, dateStyle: 'medium', timeStyle: 'short' }).format(jetzt);\nreturn [{ json: {\n  stand,\n  tage: TAGE,\n  demo: zeilen.some(r => r.version === 'demo'),\n  gesamt: zeilen.length,\n  anteilBeantwortbar: erlaubt.length ? Math.round(100 * beantwortbar / erlaubt.length) : null,\n  medianS: median === null ? null : Math.round(median * 10) / 10,\n  erlassAnzahl: zeilen.filter(r => r.erlass_suche === true).length,\n  themen,\n  luecken: lueckenListe,\n  sicherheit,\n  wochentage,\n  stunden,\n  feedback: { positiv, negativ, quote: positiv + negativ ? Math.round(100 * positiv / (positiv + negativ)) : null }\n} }];"
+        "jsCode": "// Kennzahlen der letzten 30 Tage (Zeitzone Europe/Berlin). Ausgabe: nur Zusammenfassungen.\nconst MIN_ANZAHL = 1; // Mindesthäufigkeit für „Nicht im Konzept geregelt“\nconst TZ = 'Europe/Berlin';\nconst TAGE = 30;\nconst jetzt = new Date();\nconst grenze = jetzt.getTime() - TAGE * 86400000;\nconst alle = $input.all().map(i => i.json).filter(r => r.zeitpunkt && new Date(r.zeitpunkt).getTime() >= grenze);\n// Feedback-Zeilen (kategorie 'feedback') zählen nur für die Daumen-Quote, nicht für Fragen, Themen, Zeiten oder Sicherheitsprüfung.\nconst zeilen = alle.filter(r => r.kategorie !== 'feedback');\nconst zaehle = (liste, fn) => { const m = new Map(); liste.forEach(x => { const k = fn(x); if (k) m.set(k, (m.get(k) || 0) + 1); }); return m; };\nconst sortiert = m => [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'de'));\nconst erlaubt = zeilen.filter(r => r.kategorie === 'erlaubt');\nconst zeiten = erlaubt.map(r => Number(r.antwortzeit_s)).filter(v => Number.isFinite(v)).sort((a, b) => a - b);\nlet median = null;\nif (zeiten.length) { const h = Math.floor(zeiten.length / 2); median = zeiten.length % 2 ? zeiten[h] : (zeiten[h - 1] + zeiten[h]) / 2; }\nconst beantwortbar = erlaubt.filter(r => r.beantwortbar === true).length;\nconst themen = sortiert(zaehle(zeilen, r => { const t = String(r.thema || '').trim(); return t && t !== '–' ? t : null; })).map(([name, anzahl]) => ({ name, anzahl }));\nconst luecken = new Map();\nerlaubt.filter(r => r.beantwortbar === false).forEach(r => { const s = String(r.luecke_stichwort || '').trim(); if (!s) return; const k = s.toLowerCase(); const e = luecken.get(k) || { stichwort: s, anzahl: 0 }; e.anzahl++; luecken.set(k, e); });\nconst lueckenListe = [...luecken.values()].filter(e => e.anzahl >= MIN_ANZAHL).sort((a, b) => b.anzahl - a.anzahl || a.stichwort.localeCompare(b.stichwort, 'de'));\nconst KATS = ['personenbezug', 'benotung', 'manipulation', 'themenfremd', 'unklar'];\nconst sicherheit = KATS.map(k => ({ kategorie: k, anzahl: zeilen.filter(r => r.kategorie === k).length }));\nconst fmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', hour: 'numeric', hourCycle: 'h23' });\nconst WT = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };\nconst wochentage = Array(7).fill(0);\nconst stunden = Array(24).fill(0);\nzeilen.forEach(r => { const p = Object.fromEntries(fmt.formatToParts(new Date(r.zeitpunkt)).map(x => [x.type, x.value])); wochentage[WT[p.weekday]]++; stunden[Number(p.hour) % 24]++; });\nconst positiv = alle.filter(r => r.feedback === 'positiv').length;\nconst negativ = alle.filter(r => r.feedback === 'negativ').length;\nconst stand = new Intl.DateTimeFormat('de-DE', { timeZone: TZ, dateStyle: 'medium', timeStyle: 'short' }).format(jetzt);\nreturn [{ json: {\n  stand,\n  tage: TAGE,\n  demo: alle.some(r => r.version === 'demo'),\n  gesamt: zeilen.length,\n  anteilBeantwortbar: erlaubt.length ? Math.round(100 * beantwortbar / erlaubt.length) : null,\n  medianS: median === null ? null : Math.round(median * 10) / 10,\n  erlassAnzahl: zeilen.filter(r => r.erlass_suche === true).length,\n  themen,\n  luecken: lueckenListe,\n  sicherheit,\n  wochentage,\n  stunden,\n  feedback: { positiv, negativ, quote: positiv + negativ ? Math.round(100 * positiv / (positiv + negativ)) : null }\n} }];"
       }
     },
     {
@@ -60,7 +69,10 @@
       "notes": "Why Code: baut ein einziges HTML-Dokument aus den Kennzahlen (Template, Chart.js-Einbindung); kein Standard-Node erzeugt das. Die Seite enthält nur Zusammenfassungen.",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [960, 300],
+      "position": [
+        960,
+        300
+      ],
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
@@ -72,7 +84,10 @@
       "name": "Seite ausliefern",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [1280, 300],
+      "position": [
+        1280,
+        300
+      ],
       "parameters": {
         "respondWith": "text",
         "responseBody": "={{ $json.html }}",
@@ -94,7 +109,10 @@
       "name": "Notiz ①",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-40, 120],
+      "position": [
+        -40,
+        120
+      ],
       "parameters": {
         "content": "## ① Aufruf durch die Schulleitung\nGET /ki-kompass-dashboard, geschützt mit Passwort (Basic Auth, Credential „Dashboard Schulleitung“).",
         "height": 340,
@@ -107,7 +125,10 @@
       "name": "Notiz ②",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [280, 120],
+      "position": [
+        280,
+        120
+      ],
       "parameters": {
         "content": "## ② Daten lesen\nAlle Zeilen der Data Table ki_kompass_log. Nur die Projektspalten werden genutzt.",
         "height": 340,
@@ -120,7 +141,10 @@
       "name": "Notiz ③",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [600, 120],
+      "position": [
+        600,
+        120
+      ],
       "parameters": {
         "content": "## ③ Kennzahlen berechnen\nLetzte 30 Tage, Europe/Berlin. Nur Zusammenfassungen, keine Einzelzeilen. MIN_ANZAHL steuert die Mindesthäufigkeit der Lücken-Stichworte.",
         "height": 340,
@@ -133,7 +157,10 @@
       "name": "Notiz ④",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [920, 120],
+      "position": [
+        920,
+        120
+      ],
       "parameters": {
         "content": "## ④ Webseite ausliefern\nEin HTML-Dokument (Chart.js vom CDN, Hell/Dunkel automatisch plus Umschalter) wird als text/html zurückgegeben.",
         "height": 340,
@@ -144,16 +171,48 @@
   ],
   "connections": {
     "Dashboard aufrufen": {
-      "main": [[{ "node": "Daten lesen", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Daten lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Daten lesen": {
-      "main": [[{ "node": "Kennzahlen berechnen", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Kennzahlen berechnen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Kennzahlen berechnen": {
-      "main": [[{ "node": "Seite bauen", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Seite bauen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Seite bauen": {
-      "main": [[{ "node": "Seite ausliefern", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Seite ausliefern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
