@@ -141,6 +141,8 @@ Für die Chat-Seite (Schritt 7) muss WF2 veröffentlicht sein (**Publish**); der
 | Nachweis | Datei |
 |---|---|
 | Messbare Erfolgskriterien (5 Kriterien mit Zielwerten) | [`docs/erfolgskriterien.md`](docs/erfolgskriterien.md) |
+| Testkatalog v1.1 (17 Szenarien mit Sollantworten, Durchführungsstand) | [`tests/testkatalog_v1.1.md`](tests/testkatalog_v1.1.md) |
+| Formale Evaluation aller 17 Szenarien (Julian, 24.11.): 17/17 korrekt oder überwiegend korrekt, Guardrails 7/7, Median 12,0 s, Fehlermodus, Verbesserungsplan | [`tests/ergebnisse_katalog_v1.2.md`](tests/ergebnisse_katalog_v1.2.md) |
 | Prompt-Vergleich v1/v2: Antwortzeit, Tokens, Quellentreue | [`tests/prompt_vergleich_wf2.md`](tests/prompt_vergleich_wf2.md) |
 | Guardrail-Tests (12/12) | [`tests/ergebnisse_wf2_stufe2.md`](tests/ergebnisse_wf2_stufe2.md) |
 | Erlass-Suche und Regression (5/5), Konzept-Unschärfen | [`tests/ergebnisse_wf2_stufe3.md`](tests/ergebnisse_wf2_stufe3.md) |
