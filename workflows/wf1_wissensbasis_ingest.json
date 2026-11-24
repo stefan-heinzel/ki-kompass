@@ -6,7 +6,7 @@
       "name": "Konzept hochladen",
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.6,
-      "position": [-1360, -256],
+      "position": [-1376, -32],
       "webhookId": "ki-konzept-upload",
       "parameters": {
         "authentication": "basicAuth",
@@ -35,7 +35,7 @@
       "name": "In Qdrant speichern",
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.4,
-      "position": [16, -304],
+      "position": [2000, -80],
       "parameters": {
         "mode": "insert",
         "qdrantCollection": { "__rl": true, "mode": "id", "value": "ki_konzept" },
@@ -50,7 +50,7 @@
       "name": "Embeddings Google Gemini",
       "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
       "typeVersion": 1,
-      "position": [0, -64],
+      "position": [1880, 224],
       "parameters": {},
       "credentials": {
         "googlePalmApi": { "id": "sX7e2VJ6GUWIk4YX", "name": "Gemini - Embeddings" }
@@ -61,7 +61,7 @@
       "name": "Dokument laden",
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1.1,
-      "position": [128, -64],
+      "position": [2080, 224],
       "parameters": {
         "dataType": "binary",
         "binaryMode": "specificField",
@@ -84,7 +84,7 @@
       "name": "Text-Splitter",
       "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
       "typeVersion": 1,
-      "position": [208, 144],
+      "position": [2080, 420],
       "parameters": { "chunkOverlap": 150, "options": {} }
     },
     {
@@ -92,7 +92,7 @@
       "name": "Alte Version löschen",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-688, -592],
+      "position": [240, -192],
       "parameters": {
         "method": "POST",
         "url": "https://da64c8d4-a014-4bf9-83e4-8f5faabb456e.eu-central-1-0.aws.cloud.qdrant.io:6333/collections/ki_konzept/points/delete?wait=true",
@@ -112,7 +112,7 @@
       "name": "Warten auf Löschen",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [-240, -304],
+      "position": [1440, -96],
       "parameters": { "mode": "chooseBranch", "useDataOfInput": "2" }
     },
     {
@@ -120,7 +120,7 @@
       "name": "Index sicherstellen",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-1136, -496],
+      "position": [-656, -176],
       "parameters": {
         "method": "PUT",
         "url": "https://da64c8d4-a014-4bf9-83e4-8f5faabb456e.eu-central-1-0.aws.cloud.qdrant.io:6333/collections/ki_konzept/index?wait=true",
@@ -140,7 +140,7 @@
       "name": "Index OK?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [-912, -496],
+      "position": [-240, -176],
       "parameters": {
         "conditions": {
           "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
@@ -162,7 +162,7 @@
       "name": "Abbruch: Index fehlgeschlagen",
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
-      "position": [-688, -400],
+      "position": [-128, -640],
       "parameters": {
         "errorMessage": "={{ 'Index fehlgeschlagen. Status ' + $json.statusCode + ': ' + JSON.stringify($json.body) }}"
       }
@@ -172,7 +172,7 @@
       "name": "Löschen OK?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [-464, -592],
+      "position": [544, -192],
       "parameters": {
         "conditions": {
           "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
@@ -194,7 +194,7 @@
       "name": "Abbruch: Löschen fehlgeschlagen",
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
-      "position": [-240, -640],
+      "position": [656, -624],
       "parameters": {
         "errorMessage": "={{ 'Löschen fehlgeschlagen. Status ' + $json.statusCode + ': ' + JSON.stringify($json.body) }}"
       }
@@ -204,7 +204,7 @@
       "name": "Notiz ①",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-1456, -400],
+      "position": [-1460, -160],
       "parameters": {
         "content": "## ① Upload durch Admin\nNur mit Passwort zugänglich. Admin lädt das KI-Konzept als PDF hoch und gibt die Versionsnummer an.",
         "width": 280,
@@ -217,11 +217,11 @@
       "name": "Notiz ②",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-2000, -640],
+      "position": [-740, -300],
       "parameters": {
         "content": "## ② Alte Version ersetzen\nVor dem Speichern werden alle Abschnitte der bisherigen Konzeptversion gelöscht – so gibt es nie doppelte oder veraltete Inhalte.",
         "width": 2300,
-        "height": 600,
+        "height": 420,
         "color": 5
       }
     },
@@ -230,11 +230,11 @@
       "name": "Notiz ③",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-1040, -656],
+      "position": [-220, -720],
       "parameters": {
         "content": "## ③ Sicherheitsnetz\nSchlägt Löschen oder Index fehl, stoppt der Workflow mit klarer Meldung, bevor etwas gespeichert wird.",
         "width": 1020,
-        "height": 360,
+        "height": 220,
         "color": 3
       }
     },
@@ -243,7 +243,7 @@
       "name": "Notiz ④",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-16, -576],
+      "position": [1780, -200],
       "parameters": {
         "content": "## ④ Wissensbasis befüllen\nDas PDF wird seitenweise gelesen, in Abschnitte zerlegt, von Gemini in Zahlen (Vektoren) übersetzt und mit Quelle, Version und Seitenzahl in Qdrant gespeichert.",
         "width": 520,
