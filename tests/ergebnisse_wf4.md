@@ -4,7 +4,7 @@
 
 ## Entscheidung Zugang (23.11.)
 
-Für Prototyp und Demo **ohne Anmeldung** auf der Seite. Absicherung: Pfad mit zufälligem Suffix (nicht im Repo dokumentiert, Export enthält Platzhalter `<SUFFIX>`), Kostenlimit am OpenRouter-Key (2 $), Veröffentlichung nur zu Test- und Demozeiten. WF2 selbst bleibt geschützt (Weiterleitung serverseitig mit Basic Auth). Im Echtbetrieb: Anmeldung über die schulische Plattform (z. B. LOGINEO NRW).
+Für Prototyp und Demo **ohne Anmeldung** auf der Seite. Absicherung: Pfad mit zufälligem Suffix (nicht im Repo dokumentiert, Export enthält Platzhalter `<SUFFIX>`), Kostenlimit am OpenRouter-Key (5 $), Veröffentlichung nur zu Test- und Demozeiten. WF2 selbst bleibt geschützt (Weiterleitung serverseitig mit Basic Auth). Im Echtbetrieb: Anmeldung über die schulische Plattform (z. B. LOGINEO NRW).
 
 ## Ergebnisse (Endstand 23.11.) – 7 / 7 bestanden
 
