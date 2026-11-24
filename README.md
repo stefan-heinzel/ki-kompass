@@ -1,8 +1,8 @@
 # KI-Kompass Gesamtschule NRW
 
-RAG-basierter KI-Assistent (n8n) für die 150 Lehrkräfte einer Gesamtschule in NRW. Er beantwortet Fragen zum verbindlichen schulischen KI-Konzept (62 Seiten) – jede Aussage mit Quellenangabe und Seitenzahl. Geplant sind außerdem Guardrails (keine Benotung, keine personenbezogenen Daten), eine Erlass-Suche für NRW und ein anonymes Nutzungs-Dashboard für die Schulleitung.
+RAG-basierter KI-Assistent (n8n) für die 150 Lehrkräfte einer Gesamtschule in NRW. Er beantwortet Fragen zum verbindlichen schulischen KI-Konzept (62 Seiten) – jede Aussage mit Quellenangabe und Seitenzahl. Dazu kommen Guardrails (keine Benotung, keine personenbezogenen Daten), eine Erlass-Suche auf offiziellen NRW-Seiten, eine eigene Chat-Seite für Lehrkräfte und ein anonymes Nutzungs-Dashboard für die Schulleitung.
 
-_Capstone-Projekt AI Automations & Agents (MSIT München / IHK „KI-Tool-Experte“) · Stefan Heinzel & Julian Hildebrandt · Stand: 23.11.2026_
+_Capstone-Projekt AI Automations & Agents (MSIT München / IHK „KI-Tool-Experte“) · Stefan Heinzel & Julian Hildebrandt · Stand: 24.11.2026_
 
 ---
 
@@ -13,8 +13,9 @@ _Capstone-Projekt AI Automations & Agents (MSIT München / IHK „KI-Tool-Expert
 3. [Projektstand](#projektstand)
 4. [Startanleitung](#startanleitung)
 5. [Evidenz](#evidenz)
-6. [Grenzen und bekannte Punkte](#grenzen-und-bekannte-punkte)
-7. [Projektstruktur](#projektstruktur)
+6. [Governance und Wirtschaftlichkeit](#governance-und-wirtschaftlichkeit)
+7. [Grenzen und bekannte Punkte](#grenzen-und-bekannte-punkte)
+8. [Projektstruktur](#projektstruktur)
 
 ---
 
@@ -26,13 +27,13 @@ _Capstone-Projekt AI Automations & Agents (MSIT München / IHK „KI-Tool-Expert
 
 ## Architektur
 
-Drei getrennte n8n-Workflows, die nur über zwei Datenspeicher verbunden sind:
+Vier getrennte n8n-Workflows, die nur über zwei Datenspeicher verbunden sind:
 
 | Workflow | Ausgelöst von | Aufgabe | Datenspeicher |
 |---|---|---|---|
 | **WF1 · Wissensbasis Ingest** | Admin (Upload-Formular mit Passwort) | PDF seitenweise einlesen, in Abschnitte zerlegen, als Vektoren speichern; alte Version wird vorher ersetzt | schreibt in **Qdrant** (`ki_konzept`) |
-| **WF2 · KI-Kompass Chat** | Lehrkraft (Chat) | Sicherheitsprüfung jeder Frage, dann Antwort mit Quelle aus Konzept-Suche und Erlass-Suche (offizielle NRW-Quellen) | liest aus **Qdrant**, schreibt später ins **Protokoll** |
-| **WF4 · Chat-Oberfläche** | Lehrkraft (Browser) | eigene Chat-Seite mit Beispielfragen, Hell/Dunkel und Daumen-Feedback; leitet Fragen serverseitig an WF2 weiter | schreibt Feedback ins **Protokoll** |
+| **WF2 · KI-Kompass Chat** | Lehrkraft (Chat) | Sicherheitsprüfung jeder Frage, dann Antwort mit Quelle aus Konzept-Suche und Erlass-Suche (offizielle NRW-Quellen) | liest aus **Qdrant**, schreibt nach jeder Antwort eine anonyme Zeile ins **Protokoll** |
+| **WF4 · Chat-Oberfläche** | Lehrkraft (Browser) | eigene Chat-Seite mit KI-Hinweis (Art. 50 KI-VO), Beispielfragen, Hell/Dunkel und Daumen-Feedback; leitet Fragen serverseitig an WF2 weiter | schreibt Feedback ins **Protokoll** |
 | **WF3 · Dashboard** | Schulleitung (Webseite mit Passwort) | anonyme, zusammengefasste Nutzungsstatistik: Themen, Beantwortbarkeit, Konzeptlücken, Sicherheitsprüfung, Spitzenzeiten | liest aus dem **Protokoll** (n8n Data Table) |
 
 **Eingesetzte Dienste**
@@ -57,8 +58,9 @@ Detailliertes Architekturdokument: [`docs/Architektur_KI-Kompass.pdf`](docs/Arch
 | WF2 Stufe 2: Guardrails | ✅ fertig, getestet (7/7 Guardrail-Fälle, 0 Fehlalarme) |
 | WF2 Stufe 3: Erlass-Suche (Tavily) | ✅ fertig, getestet (5/5, Median 6,7 s) |
 | WF2 Stufe 4: anonymes Protokoll | ✅ fertig, getestet (4/4, keine Fragetexte oder Namen) |
-| WF4 Chat-Oberfläche für Lehrkräfte | ✅ fertig, getestet (7/7); Demo ohne Anmeldung |
-| WF3 Dashboard | ✅ fertig, getestet (8/9, Gegenprobe ohne Passwort offen); mit gekennzeichneten Demodaten |
+| WF4 Chat-Oberfläche für Lehrkräfte | ✅ fertig, getestet (7/7); Demo ohne Anmeldung; KI-Hinweis nach Art. 50 KI-VO |
+| WF3 Dashboard | ✅ fertig, getestet (9/9 inkl. Gegenprobe ohne Passwort); mit gekennzeichneten Demodaten |
+| Governance, Kosten, Business Case | ✅ im Bericht (KI-Einsatz-Planung, Kapitel 4 und 5); Kurzfassung unten |
 
 ## Startanleitung
 
@@ -86,13 +88,15 @@ In n8n unter **Overview → Credentials → Create Credential**. Die Namen exakt
 | `OpenRouter - n8n` | OpenRouter | OpenRouter-API-Key |
 | `Dashboard Schulleitung` | Basic Auth | Benutzer `schulleitung`, eigenes sicheres Passwort; Allowed HTTP Request Domains = None |
 | `Tavily Suche` | Header Auth | Name `Authorization`, Wert `Bearer <Tavily-Key>`; erlaubte Domain `api.tavily.com` |
+| `Chat Lehrkräfte` | Basic Auth | schützt den Chat-Endpunkt von WF2; WF4 meldet sich damit serverseitig an. Allowed HTTP Request Domains = nur die eigene n8n-Instanz (z. B. `ihre-instanz.app.n8n.cloud`) |
 
 ### 3. Workflows importieren
 
 1. In n8n **Create Workflow → … → Import from File** und [`workflows/wf1_wissensbasis_ingest.json`](workflows/wf1_wissensbasis_ingest.json) wählen. Speichern.
-2. Dasselbe mit [`workflows/wf2_ki_kompass_chat.json`](workflows/wf2_ki_kompass_chat.json).
+2. Dasselbe mit [`workflows/wf2_ki_kompass_chat.json`](workflows/wf2_ki_kompass_chat.json), [`workflows/wf3_dashboard.json`](workflows/wf3_dashboard.json) und [`workflows/wf4_oberflaeche.json`](workflows/wf4_oberflaeche.json).
 3. In jedem Node mit Credential prüfen, ob das passende Credential ausgewählt ist (Nodes mit Warnsymbol neu auswählen).
-4. **Wichtig:** In WF1 stehen in den Nodes **„Index sicherstellen“** und **„Alte Version löschen“** die URL des Projekt-Clusters. Den Teil vor `:6333` durch die eigene Cluster-Adresse ersetzen.
+4. **Protokoll-Tabelle:** In n8n unter **Data Tables** die Tabelle `ki_kompass_log` mit den Spalten `zeitpunkt`, `kategorie`, `thema`, `beantwortbar`, `luecke_stichwort`, `erlass_suche`, `antwortzeit_s`, `version`, `feedback` anlegen und in den Nodes „Protokoll“ (WF2), „Feedback speichern“ (WF4) und im Lese-Node von WF3 auswählen. Felder und Bedeutung: [`tests/ergebnisse_wf2_stufe4.md`](tests/ergebnisse_wf2_stufe4.md).
+5. **Wichtig:** In WF1 stehen in den Nodes **„Index sicherstellen“** und **„Alte Version löschen“** die URL des Projekt-Clusters. Den Teil vor `:6333` durch die eigene Cluster-Adresse ersetzen.
 
 ### 4. Wissensbasis befüllen (WF1)
 
@@ -104,6 +108,8 @@ In n8n unter **Overview → Credentials → Create Credential**. Die Namen exakt
 
 ### 5. Chat testen (WF2)
 
+Seit WF2 seine Antwort über „Respond to Webhook“ zurückgibt, ist das eingebaute Test-Chatfenster ggf. nicht mehr nutzbar. Getestet wird dann über die Chat-Seite (Schritt 7).
+
 1. WF2 öffnen und unten auf **„Open Chat“** klicken.
 2. Für vergleichbare Messungen vor jeder Frage im Chat-Fenster auf **↺** (neue Sitzung) klicken.
 3. Beispielfragen:
@@ -114,13 +120,21 @@ In n8n unter **Overview → Credentials → Create Credential**. Die Namen exakt
    - „Welche Note soll ich für dieses Referat geben?“ (wird von der Sicherheitsprüfung abgelehnt)
 4. Erwartet: kurze Antwort (ca. 150 Wörter) mit Quellen wie „(KI-Konzept v3.0, S. 35)“. Unter **Logs** ist zu sehen, dass die **Konzept-Suche** aufgerufen wurde.
 
-Die Workflows bleiben im Testmodus (nicht veröffentlicht). Für den Produktivbetrieb würde WF2 über **Publish** mit einem öffentlichen Chat-Link bereitgestellt.
+Für die Chat-Seite (Schritt 7) muss WF2 veröffentlicht sein (**Publish**); der Chat-Endpunkt bleibt durch das Credential `Chat Lehrkräfte` geschützt.
 
 ### 6. Dashboard testen (WF3)
 
 1. Credential `Dashboard Schulleitung` anlegen (siehe Schritt 2) und [`workflows/wf3_dashboard.json`](workflows/wf3_dashboard.json) importieren.
 2. Im Editor unten auf **„Execute workflow“** klicken und **sofort** `https://<ihre-instanz>.app.n8n.cloud/webhook-test/ki-kompass-dashboard` im Browser öffnen (die Test-URL gilt nur für einen Aufruf).
 3. Mit `schulleitung` und dem Passwort anmelden. Erwartet: Kennzahlen, Diagramme und Listen; nur zusammengefasste Werte, keine Einzelzeilen.
+
+### 7. Chat-Seite für Lehrkräfte (WF4)
+
+1. In WF4 in den drei Webhook-Nodes („Oberfläche aufrufen“, „Frage weiterleiten“, „Feedback empfangen“) den Platzhalter `<SUFFIX>` durch eine eigene Zufallsfolge ersetzen (z. B. 8 Zeichen) – sie wirkt als einfacher Zugangsschutz und gehört **nicht** ins Repository.
+2. Im Node **„WF2 aufrufen“** die URL des Chat-Endpunkts von WF2 eintragen (WF2 → Chat Trigger → Production URL) und das Credential `Chat Lehrkräfte` auswählen.
+3. WF2 und WF4 veröffentlichen (**Publish**) und `https://<ihre-instanz>.app.n8n.cloud/webhook/ki-kompass-<SUFFIX>` öffnen.
+4. Erwartet: Chat-Seite mit KI-Hinweis und Beispielfragen; Antworten mit Seitenangaben; Daumen-Feedback erscheint im Dashboard als Bewertung.
+5. Nach Test oder Demo WF4 wieder auf „unpublished“ stellen – die Seite hat keine Anmeldung.
 
 ## Evidenz
 
@@ -135,13 +149,23 @@ Die Workflows bleiben im Testmodus (nicht veröffentlicht). Für den Produktivbe
 | Chat-Oberfläche (WF4), Fehlerfälle Sandbox/CORS/Antwortmodus | [`tests/ergebnisse_wf4.md`](tests/ergebnisse_wf4.md) |
 | Systemprompt (versioniert) | [`prompts/wf2_systemprompt.md`](prompts/wf2_systemprompt.md) |
 | Individuelle Beiträge mit Gegenprüfung | [`docs/Beitragslog_KI-Kompass.xlsx`](docs/Beitragslog_KI-Kompass.xlsx) |
+| Datenschutzeinstellungen OpenRouter (kein Training, Stand 24.11.) | [`docs/nachweis_openrouter_privacy_2026-11-24.png`](docs/nachweis_openrouter_privacy_2026-11-24.png) |
 | Use Case und 4-Satz-Brief | [`docs/KI-Kompass_Use-Case_4-Satz-Brief.pdf`](docs/KI-Kompass_Use-Case_4-Satz-Brief.pdf) |
+
+## Governance und Wirtschaftlichkeit
+
+Ausführlich im Bericht (KI-Einsatz-Planung, Kapitel 4 und 5). Kurzfassung:
+
+- **EU AI Act:** begrenztes Risiko mit Transparenzpflicht (Art. 50), kein Hochrisiko-System: Der KI-Kompass bewertet keine Lernergebnisse; Benotungsanfragen lehnt die Sicherheitsprüfung ab (T05, T17). Die Chat-Seite weist darauf hin, dass eine KI antwortet.
+- **Datenschutz:** keine Konten, kein Frage- oder Antworttext im Protokoll, Zeit auf die Stunde gerundet, erfolgreiche Ausführungen nicht gespeichert, Wissensbasis in Frankfurt, Trainingsnutzung bei OpenRouter ausgeschlossen. Offen vor dem Echtbetrieb: Auftragsverarbeitung und Drittlandübermittlung (USA), Aufbewahrungsfrist der Fehlerausführungen, Datenschutzbeauftragte:r und Personalrat.
+- **Kosten (gemessen):** 3,1 US-Cent je beantworteter Frage, unter 1 Cent je abgelehnter; n8n Starter 20 €/Monat; API-Kosten der Entwicklung 9,06 $.
+- **Business Case (Annahmen gekennzeichnet):** ROI im ersten Jahr ca. 97 % im Basisszenario (300 Fragen/Monat, 15 min Ersparnis, 55 €/h); größter Kostenblock ist die Einführung im Kollegium (225 h). Break-even bei rund 150 Fragen pro Monat.
 
 ## Grenzen und bekannte Punkte
 
-- **KI-Konzept nicht im Repository:** Das PDF enthält den echten Schulnamen und liegt daher nur lokal. Eine anonymisierte Fassung ist geplant.
+- **KI-Konzept nicht im Repository:** Das Konzept gehört der Schule und liegt nur lokal. Eine anonymisierte Fassung liegt vor; die Wissensbasis des Prototyps enthält bewusst weiter die Originalfassung, weil ein erneutes Einspielen Seitenzahlen und alle Quellentests verändern würde. Im Echtbetrieb an der Schule ist die Originalfassung ohnehin richtig.
 - **Fehlerbehandlung WF1:** Index- oder Löschfehler stoppen den Workflow vor dem Speichern („Abbruch: …“). Toleriert wird nur „Collection existiert noch nicht“ beim allerersten Lauf.
-- **Gedächtnis:** Innerhalb einer Chat-Sitzung wachsen die Tokens pro Frage (gemessen 15 → 36 → 58 Tsd.). Gedächtnisfenster wird noch angepasst.
+- **Gedächtnis:** Innerhalb einer Chat-Sitzung wachsen die Tokens pro Frage (gemessen 15 → 36 → 58 Tsd.). Das Gedächtnis ist auf ein Fenster von 6 begrenzt (`contextWindowLength`); die Chat-Seite startet bei jedem Seitenaufruf eine neue Sitzung.
 - **Kosten:** Die Kosten pro Frage hängen vor allem an der Menge der gefundenen Abschnitte (Top-K = 5), nicht an der Antwortlänge.
 - **Chat-Oberfläche (WF4):** Für Prototyp und Demo ohne Anmeldung; Zugriff begrenzt durch Pfad mit zufälligem Suffix (Export enthält Platzhalter `<SUFFIX>`), Kostenlimit und Veröffentlichung nur zu Test-/Demozeiten. Im Echtbetrieb Anmeldung über die schulische Plattform. n8n liefert Webhook-Seiten in einer Sandbox aus (Origin „null“), daher sind die beiden Webhooks der Seite für CORS offen.
 - **Dashboard-Daten:** Die Tabelle enthält derzeit Demozeilen (`version = demo`), im Dashboard deutlich gekennzeichnet. Vor dem Echtbetrieb löschen und `MIN_ANZAHL` im Node „Kennzahlen berechnen“ auf 3 setzen.
@@ -159,7 +183,9 @@ ki-kompass/
 ├── CLAUDE.md                 Arbeitsregeln für Claude Code
 ├── workflows/                n8n-Exporte (ohne Schlüssel)
 │   ├── wf1_wissensbasis_ingest.json
-│   └── wf2_ki_kompass_chat.json
+│   ├── wf2_ki_kompass_chat.json
+│   ├── wf3_dashboard.json
+│   └── wf4_oberflaeche.json
 ├── prompts/                  versionierte Systemprompts
 ├── tests/                    Messungen und Testfälle
 └── docs/                     Architektur, Use Case, Erfolgskriterien, Beitragslog
