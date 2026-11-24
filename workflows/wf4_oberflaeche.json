@@ -129,7 +129,7 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "zeitpunkt": "={{ $now.toISO() }}",
+            "zeitpunkt": "={{ $now.setZone('Europe/Berlin').startOf('hour').toISO() }}",
             "kategorie": "feedback",
             "feedback": "={{ $json.body.bewertung }}"
           },
